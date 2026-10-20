@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HERE, "fonts")
 
-WORDMARK = "MR. MARKETCAP"
+WORDMARK = "MR_MARKETCAP"
 HANDLE = "t.me/Mr_marketcap"
 ORANGE = (247, 147, 26)
 
@@ -43,8 +43,8 @@ def draw_tracked(draw, xy, text, fnt, fill, tracking):
 
 def center_mark(layer, W, H):
     d = ImageDraw.Draw(layer)
-    size = int(H * 0.052)
-    fnt = font("InterDisplay-Light.otf", size)
+    size = int(H * 0.056)
+    fnt = font("Inter-Medium.otf", size)
     tracking = size * 0.32
     tw = tracked_width(d, WORDMARK, fnt, tracking)
 
@@ -55,7 +55,7 @@ def center_mark(layer, W, H):
     cap_h = top[3] - top[1]
     y0 = cy - cap_h / 2 - top[1]
 
-    alpha = 28  # ~11% white: visible on the dark background, never in the way
+    alpha = 50  # ~20% white: clearly visible, still behind the data visually
     draw_tracked(d, (x0, y0), WORDMARK, fnt, (255, 255, 255, alpha), tracking)
 
     gap, line = size * 0.9, size * 2.2
