@@ -15,7 +15,7 @@
  * listed in ALLOWED_CHATS, so a leaked URL can't be used to post elsewhere.
  */
 
-const SERVER_INFO = { name: "mr-marketcap-telegram", version: "1.0.0" };
+const SERVER_INFO = { name: "mr-marketcap-telegram", version: "1.1.0" };
 const SUPPORTED_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"];
 
 const chatId = { type: "string", description: "Channel username (e.g. @Mr_marketcap) or numeric chat id." };
@@ -131,7 +131,82 @@ const TOOLS = [
     readOnly: true,
     noChat: true,
   },
+  {
+    name: "youtube_latest_videos",
+    description:
+      "List the newest videos of a YouTube channel from its public feed (about the last 15 uploads), newest first. " +
+      "Each item has id, title, url, published (ISO time), description, thumbnail URLs and is_short (true for Shorts).",
+    inputSchema: {
+      type: "object",
+      required: ["channel_id"],
+      properties: {
+        channel_id: { type: "string", description: "YouTube channel id starting with UC, e.g. UCcHXsOPT4wACJI4hVh-zpTA." },
+        limit: { type: "integer", description: "How many of the newest videos to return (1-15, default 5)." },
+      },
+    },
+    readOnly: true,
+    noChat: true,
+    custom: youtubeLatestVideos,
+  },
 ];
+
+function decodeXml(s) {
+  return String(s || "")
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&amp;/g, "&");
+}
+
+function tag(xml, name) {
+  const m = xml.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`));
+  return m ? decodeXml(m[1]).trim() : "";
+}
+
+async function isShort(videoId) {
+  // /shorts/<id> answers 200 for a Short and redirects (3xx) for a normal video.
+  try {
+    const r = await fetch(`https://www.youtube.com/shorts/${videoId}`, { method: "HEAD", redirect: "manual" });
+    return r.status === 200;
+  } catch {
+    return null;
+  }
+}
+
+async function youtubeLatestVideos(env, args) {
+  const channelId = String(args.channel_id || "").trim();
+  if (!/^UC[A-Za-z0-9_-]{22}$/.test(channelId)) {
+    return { isError: true, content: [{ type: "text", text: "channel_id must look like UCxxxxxxxxxxxxxxxxxxxxxx" }] };
+  }
+  const limit = Math.min(15, Math.max(1, Number(args.limit) || 5));
+  const res = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`, {
+    headers: { "user-agent": "Mozilla/5.0 (mr-marketcap-telegram)" },
+  });
+  if (!res.ok) {
+    return { isError: true, content: [{ type: "text", text: `YouTube feed returned HTTP ${res.status}` }] };
+  }
+  const xml = await res.text();
+  const entries = xml.split("<entry>").slice(1, 1 + limit).map((e) => e.split("</entry>")[0]);
+  const videos = await Promise.all(
+    entries.map(async (e) => {
+      const id = tag(e, "yt:videoId");
+      return {
+        id,
+        title: tag(e, "title"),
+        url: `https://www.youtube.com/watch?v=${id}`,
+        published: tag(e, "published"),
+        description: tag(e, "media:description"),
+        thumbnail_maxres: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+        thumbnail_hq: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+        is_short: await isShort(id),
+      };
+    })
+  );
+  return { isError: false, content: [{ type: "text", text: JSON.stringify({ channel_id: channelId, videos }) }] };
+}
 
 function rpcResult(id, result) {
   return { jsonrpc: "2.0", id, result };
@@ -179,6 +254,14 @@ async function handleToolCall(env, params) {
         isError: true,
         content: [{ type: "text", text: `chat_id "${args.chat_id}" is not in ALLOWED_CHATS.` }],
       };
+    }
+  }
+
+  if (tool.custom) {
+    try {
+      return await tool.custom(env, args);
+    } catch (e) {
+      return { isError: true, content: [{ type: "text", text: `Error: ${e}` }] };
     }
   }
 
