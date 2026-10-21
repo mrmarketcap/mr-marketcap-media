@@ -38,7 +38,7 @@ html,body {{ margin:0; background:#0E0E10; }}
 #sig .h2 {{ font-size:22px; color:#9a9aa0; margin-top:6px; }}
 #src {{ position:absolute; left:40px; bottom:20px; font-size:20px; color:#6a6a70; }}
 </style></head><body><div id="b"><div id="grid"></div>
-<div id="title">خلاصهٔ بازار ۲۴ ساعت گذشته</div>
+<div id="title">{html.escape(d.get("title") or "خلاصهٔ بازار ۲۴ ساعت گذشته")}</div>
 <div id="head">{html.escape(d["head"])}</div>
 <div class="col" style="left:80px"><div class="h">TOP GAINERS</div>{rows(d["gain"])}</div>
 <div class="col" style="left:680px"><div class="h">TOP LOSERS</div>{rows(d["lose"])}</div>

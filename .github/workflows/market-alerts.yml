@@ -4,11 +4,13 @@ on:
     - cron: "5 6 * * *"          # daily Fear & Greed (06:05 UTC = 10:05 Tbilisi)
     - cron: "5 9 * * *"          # retry later the same day if the first try had no data yet
     - cron: "3 14 * * *"         # daily market summary (14:03 UTC)
+    - cron: "3 15 * * 5"         # weekly recap (Friday 15:03 UTC)
+    - cron: "5 7 * * 1"          # weekly BTC poll (Monday 07:05 UTC)
     - cron: "7,22,37,52 * * * *" # big 1-hour moves + price records
   workflow_dispatch:
     inputs:
       mode:
-        description: "any of: fng movers records summary (space separated)"
+        description: "any of: fng movers records summary weekly poll (space separated)"
         default: "movers"
       dry:
         description: "true = print only, do not post"
@@ -23,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '3 14 * * *' && 'summary' || ((github.event.schedule == '5 6 * * *' || github.event.schedule == '5 9 * * *') && 'fng' || 'movers records')) }}
+      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '3 15 * * 5' && 'weekly' || github.event.schedule == '5 7 * * 1' && 'poll' || github.event.schedule == '3 14 * * *' && 'summary' || ((github.event.schedule == '5 6 * * *' || github.event.schedule == '5 9 * * *') && 'fng' || 'movers records')) }}
       DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
     steps:
       - uses: actions/checkout@v4

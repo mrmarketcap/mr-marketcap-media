@@ -230,5 +230,114 @@ def summary(now=None, fetch=get):
     return cap
 
 
+def pdig(x):
+    return str(x).translate(str.maketrans("0123456789,.-", "۰۱۲۳۴۵۶۷۸۹٬٫-"))
+
+
+def tg(method, **data):
+    import requests
+    r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/{method}", data=data, timeout=60)
+    r.raise_for_status()
+    return r.json()["result"]
+
+
+def weekly(now=None, fetch=get):
+    """Friday: best and worst of the week (7 days) among established coins."""
+    now = int(now or time.time())
+    s = load()
+    wk = dt.datetime.utcfromtimestamp(now).strftime("%G-W%V")
+    if s.get("weekly_week") == wk:
+        print("weekly already posted for", wk)
+        return None
+    data = {}
+    for c in SUMMARY_COINS:
+        try:
+            cs = daily_candles(f"{c}-USDT", now, fetch, pages=1)
+            last = float(fetch(f"https://api.kucoin.com/api/v1/market/orderbook/level1?symbol={c}-USDT")["data"]["price"])
+        except Exception as e:
+            print(c, "skipped", e)
+            continue
+        if len(cs) >= 8:
+            base = float(cs[-7][2])        # close of the day 7 days ago
+            data[c] = ((last / base - 1) * 100, last)
+    if len(data) < 10:
+        print("not enough data; skipped")
+        return None
+    rank = sorted(((c, v[0]) for c, v in data.items()), key=lambda x: -x[1])
+    gain = [[c, round(p, 1)] for c, p in rank[:5]]
+    lose = [[c, round(p, 1)] for c, p in rank[::-1][:5]]
+    head = " · ".join(f"{c} ${data[c][1]:,.0f} {data[c][0]:+.1f}%" for c in ("BTC", "ETH") if c in data)
+    cap = (f"📅 Weekly recap: #{gain[0][0]} {gain[0][1]:+.1f}% led the week, "
+           f"#{lose[0][0]} {lose[0][1]:+.1f}% lagged @Mr_marketcap")
+    print(cap, "|", head)
+    if DRY:
+        return cap
+    out = os.path.join(ROOT, "alerts", "market", f"weekly-{wk}.jpg")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "summary_banner.py"),
+                    json.dumps({"head": head, "gain": gain, "lose": lose, "title": "خلاصهٔ بازار هفتهٔ گذشته"}), out], check=True)
+    import requests
+    with open(out, "rb") as f:
+        r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
+                          data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
+                          files={"photo": f}, timeout=60)
+    r.raise_for_status()
+    print("sent", r.json()["result"]["message_id"])
+    s["weekly_week"] = wk
+    save(s)
+    return cap
+
+
+def poll(now=None, fetch=get):
+    """Monday: close last week's BTC poll (reply with the outcome), then open a new one."""
+    now = int(now or time.time())
+    s = load()
+    day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+    if s.get("poll_date") == day:
+        print("poll already handled for", day)
+        return None
+    q = fetch("https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT")["data"]
+    if abs(now - q["time"] / 1000) > 180:
+        print("BTC price stale; skipped")
+        return None
+    price = float(q["price"])
+    old = s.get("poll")
+    lines = []
+    if old and now - old["ts"] >= 5 * 86400:
+        ch = (price / old["price"] - 1) * 100
+        up = price > old["price"]
+        lines.append(f"close poll {old['msg']}: BTC {old['price']:,.0f} -> {price:,.0f} ({ch:+.1f}%)")
+        share = ""
+        if not DRY:
+            try:
+                res = tg("stopPoll", chat_id=CHAT, message_id=old["msg"])
+                v = [o["voter_count"] for o in res["options"]]
+                if sum(v):
+                    share = f"\n{pdig(round(100 * v[0] / sum(v)))}٪ از رأی‌دهنده‌ها «بالاتر» گفته بودن."
+            except Exception as e:
+                print("stopPoll failed", e)
+        word = "بالاتر" if up else "پایین‌تر"
+        text = (f"📊 نتیجهٔ نظرسنجی هفتهٔ پیش\n"
+                f"قیمت BTC موقع نظرسنجی {pdig(format(round(old['price']), ','))} دلار بود و الان {pdig(format(round(price), ','))} دلاره "
+                f"({pdig(format(abs(ch), '.1f'))}٪ {'بالاتر' if up else 'پایین‌تر'})، پس جواب «{word}» درست بود.{share}\n"
+                f"این فقط یه بازی آموزشیه، نه پیش‌بینی یا توصیه‌ی خرید و فروش.\n@Mr_marketcap")
+        lines.append(text)
+        if not DRY:
+            tg("sendMessage", chat_id=CHAT, text=text, reply_to_message_id=old["msg"], disable_notification="true")
+    ref = round(price, -2)
+    question = f"تا دوشنبهٔ بعد، BTC بالاتر از {pdig(format(int(ref), ','))} دلار هست؟"
+    lines.append("new poll: " + question)
+    print("\n".join(lines) + "\n@Mr_marketcap")
+    if DRY:
+        return lines
+    res = tg("sendPoll", chat_id=CHAT, question=question,
+             options=json.dumps(["آره، بالاتر", "نه، پایین‌تر"], ensure_ascii=False),
+             is_anonymous="true", disable_notification="true")
+    s["poll"] = {"msg": res["message_id"], "price": ref, "ts": now}
+    s["poll_date"] = day
+    save(s)
+    return lines
+
+
 if __name__ == "__main__":
-    {"fng": fng, "movers": movers, "records": records, "summary": summary}[sys.argv[1]]()
+    {"fng": fng, "movers": movers, "records": records, "summary": summary, "weekly": weekly, "poll": poll}[sys.argv[1]]()
