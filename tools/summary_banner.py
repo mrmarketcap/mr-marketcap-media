@@ -24,19 +24,19 @@ def page(d):
 @font-face {{ font-family: I; src: url('{FONTS}/Inter-SemiBold.otf'); font-weight:700; }}
 @font-face {{ font-family: V; src: url('{FONTS}/Vazirmatn-Bold.ttf'); font-weight:700; }}
 html,body {{ margin:0; background:#0E0E10; }}
-#b {{ position:relative; width:1280px; height:700px; overflow:hidden; font-family:I,sans-serif; color:#fff; background:#0E0E10; }}
+#b {{ position:relative; width:1280px; height:580px; overflow:hidden; font-family:I,sans-serif; color:#fff; background:#0E0E10; }}
 #grid {{ position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:64px 64px; }}
-#title {{ position:absolute; left:0; right:0; top:30px; text-align:center; font-family:V; font-weight:700; font-size:56px; direction:rtl; }}
-#head {{ position:absolute; left:0; right:0; top:118px; text-align:center; font-size:28px; color:#b8b8be; }}
-.col {{ position:absolute; top:182px; width:520px; }}
-.h {{ font-size:24px; letter-spacing:5px; color:#9a9aa0; font-weight:700; padding:0 8px 10px; border-bottom:1px solid #2a2a2e; }}
-.r {{ display:flex; justify-content:space-between; align-items:center; height:62px; padding:0 8px; border-bottom:1px solid #1c1c20; font-size:38px; font-weight:700; }}
-.p {{ font-size:38px; }}
-#bar {{ position:absolute; left:50%; bottom:112px; width:72px; height:5px; margin-left:-36px; background:#F7931A; border-radius:2px; }}
-#sig {{ position:absolute; left:0; right:0; bottom:20px; text-align:center; }}
-#sig .w {{ font-weight:700; font-size:36px; letter-spacing:12px; color:#f1f1f3; padding-left:12px; }}
-#sig .h2 {{ font-size:22px; color:#9a9aa0; margin-top:6px; }}
-#src {{ position:absolute; left:40px; bottom:20px; font-size:20px; color:#6a6a70; }}
+#title {{ position:absolute; left:0; right:0; top:16px; text-align:center; font-family:V; font-weight:700; font-size:46px; direction:rtl; }}
+#head {{ position:absolute; left:0; right:0; top:84px; text-align:center; font-size:25px; color:#b8b8be; }}
+.col {{ position:absolute; top:130px; width:520px; }}
+.h {{ font-size:21px; letter-spacing:5px; color:#9a9aa0; font-weight:700; padding:0 8px 8px; border-bottom:1px solid #2a2a2e; }}
+.r {{ display:flex; justify-content:space-between; align-items:center; height:52px; padding:0 8px; border-bottom:1px solid #1c1c20; font-size:34px; font-weight:700; }}
+.p {{ font-size:34px; }}
+#bar {{ position:absolute; left:50%; bottom:96px; width:72px; height:5px; margin-left:-36px; background:#F7931A; border-radius:2px; }}
+#sig {{ position:absolute; left:0; right:0; bottom:12px; text-align:center; }}
+#sig .w {{ font-weight:700; font-size:32px; letter-spacing:12px; color:#f1f1f3; padding-left:12px; }}
+#sig .h2 {{ font-size:20px; color:#9a9aa0; margin-top:4px; }}
+#src {{ position:absolute; left:40px; bottom:14px; font-size:18px; color:#6a6a70; }}
 </style></head><body><div id="b"><div id="grid"></div>
 <div id="title">{html.escape(d.get("title") or "خلاصهٔ بازار ۲۴ ساعت گذشته")}</div>
 <div id="head">{html.escape(d["head"])}</div>
@@ -53,11 +53,11 @@ async def render(d, out):
         open(path, "w").write(page(d))
         async with async_playwright() as p:
             b = await p.chromium.launch()
-            pg = await b.new_page(viewport={"width": 1280, "height": 700}, device_scale_factor=1)
+            pg = await b.new_page(viewport={"width": 1280, "height": 580}, device_scale_factor=1)
             await pg.goto("file://" + path)
             await pg.evaluate("document.fonts.ready")
             await pg.wait_for_timeout(300)
-            await pg.screenshot(path=out, type="jpeg", quality=88)
+            await pg.screenshot(path=out, type="jpeg", quality=72)
             await b.close()
 
 

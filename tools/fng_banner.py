@@ -67,7 +67,7 @@ async def render(args, out):
             await pg.evaluate("document.fonts.ready")
             await pg.wait_for_timeout(300)
             if out.lower().endswith((".jpg", ".jpeg")):
-                await pg.screenshot(path=out, type="jpeg", quality=88)
+                await pg.screenshot(path=out, type="jpeg", quality=80)
             else:
                 await pg.screenshot(path=out)
             await b.close()
