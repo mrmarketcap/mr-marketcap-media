@@ -29,17 +29,17 @@ def banner(ticker, price, up):
 @font-face {{ font-family: I; src: url('{FONTS}/Inter-Regular.otf'); font-weight:400; }}
 @font-face {{ font-family: I; src: url('{FONTS}/Inter-SemiBold.otf'); font-weight:700; }}
 html,body {{ margin:0; background:#0E0E10; }}
-#b {{ position:relative; width:1280px; height:720px; overflow:hidden; font-family:I,sans-serif; color:#fff;
+#b {{ position:relative; width:1280px; height:580px; overflow:hidden; font-family:I,sans-serif; color:#fff;
   background: radial-gradient(900px 520px at 50% 52%, {glow}, rgba(14,14,16,0) 70%), #0E0E10; }}
 #grid {{ position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size:64px 64px; }}
-#pill {{ position:absolute; left:50%; top:78px; transform:translateX(-50%); display:flex; align-items:center; gap:18px; background:#1a1a1d; border:1px solid #2c2c31; border-radius:60px; padding:14px 46px; font-weight:700; font-size:44px; letter-spacing:4px; }}
-#price {{ position:absolute; left:0; right:0; top:250px; text-align:center; font-weight:700; font-size:180px; letter-spacing:-4px; line-height:1; }}
-#arrow {{ position:absolute; left:50%; top:470px; transform:translateX(-50%); }}
-#sig {{ position:absolute; left:0; right:0; bottom:40px; text-align:center; }}
+#pill {{ position:absolute; left:50%; top:46px; transform:translateX(-50%); display:flex; align-items:center; gap:18px; background:#1a1a1d; border:1px solid #2c2c31; border-radius:60px; padding:14px 46px; font-weight:700; font-size:44px; letter-spacing:4px; }}
+#price {{ position:absolute; left:0; right:0; top:178px; text-align:center; font-weight:700; font-size:180px; letter-spacing:-4px; line-height:1; }}
+#arrow {{ position:absolute; left:50%; top:386px; transform:translateX(-50%); }}
+#sig {{ position:absolute; left:0; right:0; bottom:24px; text-align:center; }}
 #sig .w {{ font-weight:700; font-size:46px; letter-spacing:14px; color:#f1f1f3; padding-left:14px; }}
 #sig .h {{ font-size:28px; color:#9a9aa0; margin-top:10px; }}
-#logo {{ position:absolute; left:56px; top:50px; width:124px; height:124px; }}
-#bar {{ position:absolute; left:50%; bottom:158px; width:72px; height:5px; margin-left:-36px; background:#F7931A; border-radius:2px; }}
+#logo {{ position:absolute; left:56px; top:30px; width:124px; height:124px; }}
+#bar {{ position:absolute; left:50%; bottom:124px; width:72px; height:5px; margin-left:-36px; background:#F7931A; border-radius:2px; }}
 </style></head><body><div id="b"><div id="grid"></div>
 {logo}<div id="pill">{ticker}</div>
 <div id="price">${price}</div>
@@ -57,7 +57,7 @@ async def render(ticker, level, up, out_png):
             f.write(html)
         async with async_playwright() as p:
             b = await p.chromium.launch()
-            pg = await b.new_page(viewport={"width": 1280, "height": 720}, device_scale_factor=2)
+            pg = await b.new_page(viewport={"width": 1280, "height": 580}, device_scale_factor=2)
             await pg.goto("file://" + path)
             await pg.evaluate("document.fonts.ready")
             await pg.wait_for_timeout(400)

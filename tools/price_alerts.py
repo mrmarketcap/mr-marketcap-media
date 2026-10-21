@@ -12,7 +12,7 @@ PENDING = os.path.join(ROOT, "pending.json")
 STEPS = {"BTC": 500, "ETH": 100}
 CHAT = "@Mr_marketcap"
 WINDOW = 1200      # look back at most 20 minutes
-DAILY_CAP = 8
+DAILY_CAP = 20
 API = "https://api.kucoin.com"
 
 
