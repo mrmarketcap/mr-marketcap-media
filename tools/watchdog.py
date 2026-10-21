@@ -56,7 +56,7 @@ def problems(now, runs_for=gh_runs):
     if h >= 10.5 and irr.get("date") != today:
         out["daily-irr"] = "⚠️ قیمت دلار، طلا و سکهٔ امروز هنوز نرفته (شاید دو منبع قیمت با هم نخونن)."
     cs = jload("content-state.json", {})
-    if h >= 9.5 and cs.get("last_date") != today:
+    if h >= 10.75 and cs.get("last_date") != today:
         out["daily-content"] = "⚠️ پست آموزشی امروز هنوز نرفته."
     try:
         bank = jload("data/content_bank.json", [])
