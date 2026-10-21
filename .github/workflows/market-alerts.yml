@@ -1,0 +1,54 @@
+name: market-alerts
+on:
+  schedule:
+    - cron: "5 6 * * *"          # daily Fear & Greed (06:05 UTC = 10:05 Tbilisi)
+    - cron: "7,22,37,52 * * * *" # big 1-hour moves of major coins
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "fng or movers"
+        default: "movers"
+      dry:
+        description: "true = print only, do not post"
+        default: "true"
+permissions:
+  contents: write
+concurrency:
+  group: market-alerts
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '5 6 * * *' && 'fng' || 'movers') }}
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check what would be posted
+        run: DRY_RUN=1 python tools/market_alerts.py "$MODE" | tee out.txt
+      - name: Install renderer (only when there is something to post)
+        if: ${{ env.DRYFLAG != 'true' && hashFiles('out.txt') != '' }}
+        run: |
+          if grep -q '@Mr_marketcap' out.txt; then
+            pip install playwright requests
+            python -m playwright install --with-deps chromium
+            echo POST=1 >> "$GITHUB_ENV"
+          fi
+      - name: Post
+        if: ${{ env.POST == '1' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python tools/market_alerts.py "$MODE"
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          rm -f out.txt
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          git add market-state.json alerts || true
+          git diff --cached --quiet || git commit -m "Market alert state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
