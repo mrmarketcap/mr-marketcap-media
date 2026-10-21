@@ -77,7 +77,7 @@ def text_for(row, ev, last, pct, now):
     else:
         body = (f"⚠️ آپدیت {t}\nاز تحلیل {fa(days)} روز پیش (قیمت اون موقع {p0}) تا الان حدود {n}٪ ریزش داشته، "
                 f"ولی هنوز کندل روزانه‌ای زیر {fa(row['bear_trigger'])} بسته نشده و سطح کلیدی تأیید نشده.")
-    return body + "\nاین آپدیت آموزشیه، نه توصیه‌ی خرید یا فروش.\n@Mr_marketcap"
+    return body + "\n@Mr_marketcap"
 
 
 def run(now=None, fetch=get, send=None):
