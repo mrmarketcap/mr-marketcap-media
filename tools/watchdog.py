@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "watchdog-state.json")
 DRY = os.environ.get("DRY_RUN") == "1"
 NAMES = {"price-alerts.yml": "هشدار قیمت BTC/ETH", "market-alerts.yml": "پست‌های بازار (ترس و طمع، جابه‌جایی، خلاصه، رکورد، نظرسنجی)",
-         "channel-tasks.yml": "پاسخ تحلیل‌ها و یوتیوب", "irr-post.yml": "قیمت دلار، طلا و سکه"}
+         "channel-tasks.yml": "پاسخ تحلیل‌ها و یوتیوب", "irr-post.yml": "قیمت دلار، طلا و سکه", "content-post.yml": "پست آموزشی روزانه"}
 REPEAT_H = 6
 PAT_EXPIRES = dt.date(2027, 1, 20)
 
@@ -55,6 +55,17 @@ def problems(now, runs_for=gh_runs):
         out["daily-summary"] = "⚠️ خلاصهٔ روزانهٔ بازار امروز هنوز نرفته."
     if h >= 10.5 and irr.get("date") != today:
         out["daily-irr"] = "⚠️ قیمت دلار، طلا و سکهٔ امروز هنوز نرفته (شاید دو منبع قیمت با هم نخونن)."
+    cs = jload("content-state.json", {})
+    if h >= 9.5 and cs.get("last_date") != today:
+        out["daily-content"] = "⚠️ پست آموزشی امروز هنوز نرفته."
+    try:
+        bank = jload("data/content_bank.json", [])
+        used = set(cs.get("used", []))
+        left = sum(1 for it in bank if it["type"] != "history" and it["id"] not in used)
+        if bank and left < 7:
+            out["bank-low"] = f"📚 بانک محتوای آموزشی فقط {left} مورد مونده. وقتشه موارد جدید بنویسیم."
+    except Exception:
+        pass
     if (PAT_EXPIRES - now.date()).days <= 14:
         out["pat"] = f"⏰ توکن گیت‌هاب (برای سرور کلودفلر) تا {PAT_EXPIRES} تموم می‌شه. قبلش یکی جدید بساز و جایگزین کن."
     return out

@@ -1,0 +1,44 @@
+name: content-post
+on:
+  schedule:
+    - cron: "30 8 * * *"         # daily educational post (08:30 UTC = 12:30 Tbilisi)
+    - cron: "30 10 * * *"        # retry if the first run did not happen
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "true = print only, do not post"
+        default: "true"
+permissions:
+  contents: write
+concurrency:
+  group: content-post
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Run
+        run: |
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            DRY_RUN=1 python tools/content_post.py 2>&1 | tee "runlogs/content-$(date -u +%H%M%S).txt"
+          else
+            python tools/content_post.py
+          fi
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          for f in content-state.json runlogs; do [ -e "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet || git commit -m "Content state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
