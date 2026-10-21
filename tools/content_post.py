@@ -5,6 +5,8 @@ Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1).
 """
 import datetime as dt, json, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tgfmt import bold_first
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BANK = os.path.join(ROOT, "data", "content_bank.json")
 STATE = os.path.join(ROOT, "content-state.json")
@@ -69,7 +71,7 @@ def run(now=None):
         return text
     import requests
     r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
-                      data={"chat_id": CHAT, "text": text, "disable_notification": "true"}, timeout=30)
+                      data={"chat_id": CHAT, "text": bold_first(text), "parse_mode": "HTML", "disable_notification": "true"}, timeout=30)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
     state["used"] = state.get("used", []) + [key]

@@ -5,6 +5,8 @@ Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1). State: market-state.json
 """
 import datetime as dt, json, os, subprocess, sys, time, urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tgfmt import bold_first
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "market-state.json")
 CHAT = "@Mr_marketcap"
@@ -40,7 +42,7 @@ def post(cmd, caption, name):
     import requests
     with open(out, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
-                          data={"chat_id": CHAT, "caption": caption, "disable_notification": "true"},
+                          data={"chat_id": CHAT, "caption": bold_first(caption), "parse_mode": "HTML", "disable_notification": "true"},
                           files={"photo": f}, timeout=60)
     r.raise_for_status()
     print("sent", caption, r.json()["result"]["message_id"])
@@ -221,7 +223,7 @@ def summary(now=None, fetch=get):
     import requests
     with open(out, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
-                          data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
+                          data={"chat_id": CHAT, "caption": bold_first(cap), "parse_mode": "HTML", "disable_notification": "true"},
                           files={"photo": f}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
@@ -279,7 +281,7 @@ def weekly(now=None, fetch=get):
     import requests
     with open(out, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
-                          data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
+                          data={"chat_id": CHAT, "caption": bold_first(cap), "parse_mode": "HTML", "disable_notification": "true"},
                           files={"photo": f}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
@@ -323,7 +325,7 @@ def poll(now=None, fetch=get):
                 f"@Mr_marketcap")
         lines.append(text)
         if not DRY:
-            tg("sendMessage", chat_id=CHAT, text=text, reply_to_message_id=old["msg"], disable_notification="true")
+            tg("sendMessage", chat_id=CHAT, text=bold_first(text), parse_mode="HTML", reply_to_message_id=old["msg"], disable_notification="true")
     ref = round(price, -2)
     question = f"تا دوشنبهٔ بعد، BTC بالاتر از {pdig(format(int(ref), ','))} دلار هست؟"
     lines.append("new poll: " + question)

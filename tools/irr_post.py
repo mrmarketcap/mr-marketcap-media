@@ -4,6 +4,8 @@ Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1). State: irr-state.json
 """
 import datetime as dt, json, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tgfmt import bold_first
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "irr-state.json")
 CHAT = "@Mr_marketcap"
@@ -84,7 +86,7 @@ def run(fetch=sources, now=None):
         return text
     import requests
     r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
-                      data={"chat_id": CHAT, "text": text, "disable_notification": "true"}, timeout=60)
+                      data={"chat_id": CHAT, "text": bold_first(text), "parse_mode": "HTML", "disable_notification": "true"}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
     prices = dict(s.get("prices", {}))

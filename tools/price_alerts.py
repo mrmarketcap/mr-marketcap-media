@@ -6,6 +6,8 @@ Needs env TELEGRAM_BOT_TOKEN for `send`. State: price-alerts-state.json
 """
 import json, os, subprocess, sys, time, urllib.request, datetime as dt
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tgfmt import bold_first
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "price-alerts-state.json")
 PENDING = os.path.join(ROOT, "pending.json")
@@ -99,7 +101,7 @@ def send():
         cap = f"{'🟢' if a['up'] else '🔴'} ${a['level']:,} #{a['coin']}\n@Mr_marketcap"
         with open(png, "rb") as f:
             r = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
-                              data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
+                              data={"chat_id": CHAT, "caption": bold_first(cap), "parse_mode": "HTML", "disable_notification": "true"},
                               files={"photo": f}, timeout=60)
         r.raise_for_status()
         mid = r.json()["result"]["message_id"]

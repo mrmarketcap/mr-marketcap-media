@@ -3,6 +3,8 @@ Source: ForexFactory public weekly JSON. Env: TELEGRAM_BOT_TOKEN (not needed wit
 """
 import datetime as dt, json, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tgfmt import bold_first
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "calendar-state.json")
 CHAT = "@Mr_marketcap"
@@ -110,7 +112,7 @@ def run(now=None, data=None):
         return text
     import requests
     r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
-                      data={"chat_id": CHAT, "text": text, "disable_notification": "true"}, timeout=60)
+                      data={"chat_id": CHAT, "text": bold_first(text), "parse_mode": "HTML", "disable_notification": "true"}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
     json.dump({"week": wk}, open(STATE, "w"))
