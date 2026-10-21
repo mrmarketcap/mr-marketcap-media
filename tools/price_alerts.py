@@ -32,6 +32,7 @@ def load_state():
     s.setdefault("alerts_today", 0)
     for c in STEPS:
         s.setdefault(c, {})
+        s[c].setdefault("alerts_today", 0)
         s[c].setdefault("last_alert_level", None)
         s[c].setdefault("last_alert_ts", 0)
     return s
@@ -41,9 +42,12 @@ def detect(now=None, fetch=get):
     now = int(now or time.time())
     s = load_state()
     today = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
-    count = s["alerts_today"] if s["day"] == today else 0
+    same_day = s["day"] == today
     out = []
     for coin, step in STEPS.items():
+        if (s[coin]["alerts_today"] if same_day else 0) >= DAILY_CAP:
+            print(f"{coin}: daily cap reached")
+            continue
         sym = f"{coin}-USDT"
         st = s[coin]
         start = max(int(st["last_alert_ts"]), now - WINDOW)
@@ -68,7 +72,6 @@ def detect(now=None, fetch=get):
         lvl = min(cands, key=lambda l: abs(l - cur))
         out.append({"coin": coin, "level": lvl, "up": first < lvl, "price": cur})
         print(f"{coin}: {cur} -> alert {lvl} {'up' if first < lvl else 'down'}")
-    out = out[: max(0, DAILY_CAP - count)]
     if out:
         json.dump({"now": now, "alerts": out}, open(PENDING, "w"))
     elif os.path.exists(PENDING):
@@ -85,6 +88,8 @@ def send():
     today = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
     if s["day"] != today:
         s["day"], s["alerts_today"] = today, 0
+        for c in STEPS:
+            s[c]["alerts_today"] = 0
     stamp = dt.datetime.utcfromtimestamp(now).strftime("%Y%m%d-%H%M")
     os.makedirs(os.path.join(ROOT, "alerts", today[:7]), exist_ok=True)
     for a in p["alerts"]:
@@ -102,12 +107,13 @@ def send():
         s[a["coin"]]["last_alert_level"] = a["level"]
         s[a["coin"]]["last_alert_ts"] = now
         s["alerts_today"] += 1
+        s[a["coin"]]["alerts_today"] += 1
         json.dump(s, open(STATE, "w"), indent=1)  # save after every successful post
     os.remove(PENDING)
 
 
 def test():
-    """Send a test banner to the channel and delete it right away."""
+    """Send a test banner to the channel (the user deletes it by hand)."""
     import requests
     token = os.environ["TELEGRAM_BOT_TOKEN"]
     png = os.path.join(ROOT, "test-banner.png")
@@ -118,10 +124,7 @@ def test():
                           files={"photo": f}, timeout=60)
     r.raise_for_status()
     mid = r.json()["result"]["message_id"]
-    d = requests.post(f"https://api.telegram.org/bot{token}/deleteMessage", data={"chat_id": CHAT, "message_id": mid}, timeout=30)
-    print("test sent and deleted:", mid, d.json().get("ok"))
-    if not d.json().get("ok"):
-        sys.exit("delete failed")
+    print("test sent (not deleted):", mid)
 
 
 if __name__ == "__main__":
