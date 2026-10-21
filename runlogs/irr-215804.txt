@@ -1,0 +1,4 @@
+usd tgju 269400 alanchand 269800
+gold18 tgju 27055000 alanchand 27148070
+coin tgju 271425000 alanchand 269000000
+🟠 دلار آزاد: ۲۶۹٬۶۰۰ تومان @Mr_marketcap | تومان | [{'label': 'طلای ۱۸ عیار (گرم)', 'value': '27,102,000', 'ch': None}, {'label': 'سکه امامی', 'value': '270,200,000', 'ch': None}]
