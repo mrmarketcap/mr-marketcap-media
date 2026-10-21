@@ -1,0 +1,8 @@
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:248: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  wk = dt.datetime.utcfromtimestamp(now).strftime("%G-W%V")
+TON skipped 'data'
+📅 Weekly recap: #NEAR +9.3% led the week, #AVAX -1.8% lagged @Mr_marketcap | BTC $84,809 +3.8% · ETH $2,499 +3.2%
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:295: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+new poll: تا دوشنبهٔ بعد، BTC بالاتر از ۸۴٬۸۰۰ دلار هست؟
+@Mr_marketcap
