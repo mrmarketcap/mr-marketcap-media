@@ -93,7 +93,7 @@ def send():
     stamp = dt.datetime.utcfromtimestamp(now).strftime("%Y%m%d-%H%M")
     os.makedirs(os.path.join(ROOT, "alerts", today[:7]), exist_ok=True)
     for a in p["alerts"]:
-        png = os.path.join(ROOT, "alerts", today[:7], f"{a['coin'].lower()}-{a['level']}-{stamp}.png")
+        png = os.path.join(ROOT, "alerts", today[:7], f"{a['coin'].lower()}-{a['level']}-{stamp}.jpg")
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "price_banner.py"), a["coin"],
                         str(a["level"]), "up" if a["up"] else "down", png], check=True)
         cap = f"{'🟢' if a['up'] else '🔴'} ${a['level']:,} #{a['coin']} @Mr_marketcap"
@@ -116,7 +116,7 @@ def test():
     """Send a test banner to the channel (the user deletes it by hand)."""
     import requests
     token = os.environ["TELEGRAM_BOT_TOKEN"]
-    png = os.path.join(ROOT, "test-banner.png")
+    png = os.path.join(ROOT, "test-banner.jpg")
     subprocess.run([sys.executable, os.path.join(ROOT, "tools", "price_banner.py"), "BTC", "84500", "up", png], check=True)
     with open(png, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",

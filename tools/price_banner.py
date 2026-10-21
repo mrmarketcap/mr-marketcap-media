@@ -57,11 +57,14 @@ async def render(ticker, level, up, out_png):
             f.write(html)
         async with async_playwright() as p:
             b = await p.chromium.launch()
-            pg = await b.new_page(viewport={"width": 1280, "height": 580}, device_scale_factor=2)
+            pg = await b.new_page(viewport={"width": 1280, "height": 580}, device_scale_factor=1)
             await pg.goto("file://" + path)
             await pg.evaluate("document.fonts.ready")
             await pg.wait_for_timeout(400)
-            await pg.screenshot(path=out_png)
+            if out_png.lower().endswith((".jpg", ".jpeg")):
+                await pg.screenshot(path=out_png, type="jpeg", quality=88)
+            else:
+                await pg.screenshot(path=out_png)
             await b.close()
 
 
