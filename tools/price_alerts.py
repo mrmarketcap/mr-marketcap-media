@@ -106,5 +106,23 @@ def send():
     os.remove(PENDING)
 
 
+def test():
+    """Send a test banner to the channel and delete it right away."""
+    import requests
+    token = os.environ["TELEGRAM_BOT_TOKEN"]
+    png = os.path.join(ROOT, "test-banner.png")
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "price_banner.py"), "BTC", "84500", "up", png], check=True)
+    with open(png, "rb") as f:
+        r = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
+                          data={"chat_id": CHAT, "caption": "test", "disable_notification": "true"},
+                          files={"photo": f}, timeout=60)
+    r.raise_for_status()
+    mid = r.json()["result"]["message_id"]
+    d = requests.post(f"https://api.telegram.org/bot{token}/deleteMessage", data={"chat_id": CHAT, "message_id": mid}, timeout=30)
+    print("test sent and deleted:", mid, d.json().get("ok"))
+    if not d.json().get("ok"):
+        sys.exit("delete failed")
+
+
 if __name__ == "__main__":
-    {"detect": detect, "send": send}[sys.argv[1]]()
+    {"detect": detect, "send": send, "test": test}[sys.argv[1]]()

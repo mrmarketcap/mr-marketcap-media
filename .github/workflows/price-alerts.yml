@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test banner and delete it"
+        default: "false"
 permissions:
   contents: write
 concurrency:
@@ -17,7 +21,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Test send (manual only)
+        if: ${{ github.event.inputs.test == 'true' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          pip install playwright requests
+          python -m playwright install --with-deps chromium
+          python tools/price_alerts.py test
       - name: Detect round-level crossings
+        if: ${{ github.event.inputs.test != 'true' }}
         run: python tools/price_alerts.py detect
       - name: Install renderer (only when there is an alert)
         if: ${{ hashFiles('pending.json') != '' }}
