@@ -96,7 +96,7 @@ def send():
         png = os.path.join(ROOT, "alerts", today[:7], f"{a['coin'].lower()}-{a['level']}-{stamp}.jpg")
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "price_banner.py"), a["coin"],
                         str(a["level"]), "up" if a["up"] else "down", png], check=True)
-        cap = f"{'🟢⬆️' if a['up'] else '🔴⬇️'} ${a['level']:,} #{a['coin']}\n@Mr_marketcap"
+        cap = f"{'🟢' if a['up'] else '🔴'} ${a['level']:,} #{a['coin']}\n@Mr_marketcap"
         with open(png, "rb") as f:
             r = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
                               data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
