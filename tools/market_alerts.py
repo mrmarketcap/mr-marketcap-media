@@ -64,7 +64,7 @@ def fng(fetch=None):
     y = d[1] if len(d) > 1 else d[0]
     w = d[7] if len(d) > 7 else d[-1]
     tone = "up" if val >= 55 else "down" if val <= 45 else "flat"
-    cap = f"{'🟢' if tone == 'up' else '🔴' if tone == 'down' else '🟠'} Fear & Greed Index: {val} ({label}) @Mr_marketcap"
+    cap = f"{'🟢' if tone == 'up' else '🔴' if tone == 'down' else '🟠'} Fear & Greed Index: {val} ({label})\n@Mr_marketcap"
     print(cap)
     if DRY:
         return cap
@@ -103,7 +103,7 @@ def movers(now=None, fetch=get):
     for _, c, pct, p1 in hits[:2]:
         up = pct > 0
         price = f"${p1:,.2f}" if p1 < 1000 else f"${p1:,.0f}"
-        cap = f"{'🟢' if up else '🔴'} #{c} {pct:+.1f}% in 1h ({price}) @Mr_marketcap"
+        cap = f"{'🟢' if up else '🔴'} #{c} {pct:+.1f}% in 1h ({price})\n@Mr_marketcap"
         print(cap)
         out.append(cap)
         if DRY:
@@ -171,7 +171,7 @@ def records(now=None, fetch=get):
             if s["records"].get(f"{coin}-{kind}") == day:
                 continue
             val = f"${price:,.0f}"
-            cap = f"{'🟢' if tone == 'up' else '🔴'} #{coin} {label}: {val} @Mr_marketcap"
+            cap = f"{'🟢' if tone == 'up' else '🔴'} #{coin} {label}: {val}\n@Mr_marketcap"
             print(cap)
             out.append(cap)
             if not DRY:
@@ -210,7 +210,7 @@ def summary(now=None, fetch=get):
     lose = [[c, round(p, 1)] for c, p in rank[::-1][:5]]
     head = " · ".join(f"{c} ${data[c][1]:,.0f} {data[c][0]:+.1f}%" for c in ("BTC", "ETH") if c in data)
     cap = (f"📊 Market summary, last 24h: #{gain[0][0]} {gain[0][1]:+.1f}% on top, "
-           f"#{lose[0][0]} {lose[0][1]:+.1f}% at the bottom @Mr_marketcap")
+           f"#{lose[0][0]} {lose[0][1]:+.1f}% at the bottom\n@Mr_marketcap")
     print(cap, "|", head)
     if DRY:
         return cap
@@ -268,7 +268,7 @@ def weekly(now=None, fetch=get):
     lose = [[c, round(p, 1)] for c, p in rank[::-1][:5]]
     head = " · ".join(f"{c} ${data[c][1]:,.0f} {data[c][0]:+.1f}%" for c in ("BTC", "ETH") if c in data)
     cap = (f"📅 Weekly recap: #{gain[0][0]} {gain[0][1]:+.1f}% led the week, "
-           f"#{lose[0][0]} {lose[0][1]:+.1f}% lagged @Mr_marketcap")
+           f"#{lose[0][0]} {lose[0][1]:+.1f}% lagged\n@Mr_marketcap")
     print(cap, "|", head)
     if DRY:
         return cap

@@ -26,25 +26,17 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install requests
-      - name: Check
+      - name: Run
         run: |
-          DRY_RUN=1 python tools/irr_post.py 2>&1 | tee out.txt
-          if [ "$DRYFLAG" = "true" ]; then mkdir -p runlogs; cp out.txt "runlogs/irr-$(date -u +%H%M%S).txt"; fi
-      - name: Install renderer (only when there is something to post)
-        if: ${{ env.DRYFLAG != 'true' }}
-        run: |
-          if grep -q '@Mr_marketcap' out.txt; then
-            pip install playwright
-            python -m playwright install --with-deps chromium
-            echo POST=1 >> "$GITHUB_ENV"
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            DRY_RUN=1 python tools/irr_post.py 2>&1 | tee "runlogs/irr-$(date -u +%H%M%S).txt"
+          else
+            python tools/irr_post.py
           fi
-      - name: Post
-        if: ${{ env.POST == '1' }}
-        run: python tools/irr_post.py
       - name: Save state
         if: ${{ always() }}
         run: |
-          rm -f out.txt
           git config user.name "mrmarketcap"
           git config user.email "noreply@anthropic.com"
           for f in irr-state.json alerts runlogs; do [ -e "$f" ] && git add "$f"; done; true

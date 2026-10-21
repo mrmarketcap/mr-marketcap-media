@@ -1,8 +1,8 @@
-"""Free-market US dollar, 18k gold gram and Emami coin in Iran (toman), one banner for @Mr_marketcap. One silent post per day.
+"""Free-market US dollar, 18k gold gram and Emami coin in Iran (toman), one text post, no banner for @Mr_marketcap. One silent post per day.
 Source: TGJU public JSON, cross-checked against AlanChand (must agree within 2%) before posting.
 Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1). State: irr-state.json
 """
-import datetime as dt, json, os, re, subprocess, sys
+import datetime as dt, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "irr-state.json")
@@ -43,7 +43,6 @@ def sources():
 
 
 STEP = {"usd": 100, "gold18": 1000, "coin": 100000}
-LABEL = {"gold18": "طلای ۱۸ عیار (گرم)", "coin": "سکه امامی"}
 
 
 def run(fetch=sources, now=None):
@@ -69,30 +68,29 @@ def run(fetch=sources, now=None):
     if "usd" not in price:
         print("no dollar price; nothing posted")
         return None
-    c = ch["usd"]
-    tone = "flat" if c is None or abs(c) < 0.05 else ("up" if c > 0 else "down")
-    sub = "تومان" if c is None else (f"تومان · {c:+.1f}% نسبت به دیروز" if tone != "flat" else "تومان · تقریباً بدون تغییر")
-    rows = [{"label": LABEL[k], "value": f"{price[k]:,}", "ch": ch[k]} for k in ("gold18", "coin") if k in price]
-    emoji = {"up": "🟢", "down": "🔴", "flat": "🟠"}[tone]
-    cap = f"{emoji} دلار آزاد: {pdig(format(price['usd'], ','))} تومان @Mr_marketcap"
-    print(cap, "|", sub, "|", rows)
+    def line(emoji_name, k):
+        c = ch.get(k)
+        mark = "🟠" if c is None or abs(c) < 0.05 else ("🟢" if c > 0 else "🔴")
+        tail = "" if c is None else (" (تقریباً بدون تغییر)" if abs(c) < 0.05 else f" ({pdig(format(abs(c), '.1f'))}٪ {'بالاتر' if c > 0 else 'پایین‌تر'} از دیروز)")
+        return f"{mark} {emoji_name}: {pdig(format(price[k], ','))} تومان{tail}"
+    lines = ["💵 قیمت امروز بازار آزاد", line("دلار", "usd")]
+    if "gold18" in price:
+        lines.append(line("طلای ۱۸ عیار (هر گرم)", "gold18"))
+    if "coin" in price:
+        lines.append(line("سکه امامی", "coin"))
+    text = "\n".join(lines) + "\n@Mr_marketcap"
+    print(text)
     if DRY:
-        return cap
-    out = os.path.join(ROOT, "alerts", "irr", f"usd-{day}.jpg")
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    data = {"big": f"{price['usd']:,}", "sub": sub, "tone": tone, "rows": rows}
-    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "irr_banner.py"), json.dumps(data, ensure_ascii=False), out], check=True)
+        return text
     import requests
-    with open(out, "rb") as f:
-        r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
-                          data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
-                          files={"photo": f}, timeout=60)
+    r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
+                      data={"chat_id": CHAT, "text": text, "disable_notification": "true"}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
     prices = dict(s.get("prices", {}))
     prices.update(price)
     json.dump({"date": day, "prices": prices}, open(STATE, "w"))
-    return cap
+    return text
 
 
 if __name__ == "__main__":
