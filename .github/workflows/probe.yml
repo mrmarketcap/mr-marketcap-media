@@ -1,0 +1,13 @@
+name: probe
+on: workflow_dispatch
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s -m 20 https://nfs.faireconomy.media/ff_calendar_thisweek.json -o ff.json -w "%{http_code}\n"
+          python3 -c "
+          import json;d=json.load(open('ff.json'));print(len(d))
+          for x in d:
+              if x['impact']=='High': print(x['date'],x['country'],x['title'])
+          "
