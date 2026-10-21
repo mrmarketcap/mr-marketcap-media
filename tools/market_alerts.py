@@ -320,7 +320,7 @@ def poll(now=None, fetch=get):
         text = (f"📊 نتیجهٔ نظرسنجی هفتهٔ پیش\n"
                 f"قیمت BTC موقع نظرسنجی {pdig(format(round(old['price']), ','))} دلار بود و الان {pdig(format(round(price), ','))} دلاره "
                 f"({pdig(format(abs(ch), '.1f'))}٪ {'بالاتر' if up else 'پایین‌تر'})، پس جواب «{word}» درست بود.{share}\n"
-                f"این فقط یه بازی آموزشیه، نه پیش‌بینی یا توصیه‌ی خرید و فروش.\n@Mr_marketcap")
+                f"@Mr_marketcap")
         lines.append(text)
         if not DRY:
             tg("sendMessage", chat_id=CHAT, text=text, reply_to_message_id=old["msg"], disable_notification="true")
