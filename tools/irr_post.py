@@ -63,7 +63,7 @@ def run(fetch=sources, now=None):
         if not b or abs(a / b - 1) > 0.03:        # AlanChand is live; TGJU may lag
             print(k, "sources missing or disagree; skipped")
             continue
-        price[k] = round((a + b) / 2 / STEP[k]) * STEP[k]
+        price[k] = round(b / STEP[k]) * STEP[k]      # live AlanChand value; TGJU only sanity-checks it
         old = s.get("prices", {}).get(k)
         ch[k] = (price[k] / old - 1) * 100 if old else None
     if "usd" not in price:
