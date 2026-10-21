@@ -1,0 +1,14 @@
+name: probe
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests
+      - run: mkdir -p runlogs && python tools/probe_irr.py 2>&1 | tee runlogs/probe-irr.txt
+      - run: |
+          git config user.name mrmarketcap; git config user.email noreply@anthropic.com
+          git add runlogs; git commit -qm "probe" ; for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
