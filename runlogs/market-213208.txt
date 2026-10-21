@@ -1,0 +1,7 @@
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:140: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+BTC 84,810 no record
+ETH 2,500 no record
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:195: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+📊 Market summary, last 24h: #NEAR +7.8% on top, #TRX -0.1% at the bottom @Mr_marketcap | BTC $84,810 +2.3% · ETH $2,500 +1.9%
