@@ -1,0 +1,46 @@
+name: watchdog
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "true = print only, send nothing"
+        default: "true"
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: watchdog
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_OWNER_CHAT_ID: ${{ secrets.TELEGRAM_OWNER_CHAT_ID }}
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Watch
+        run: |
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            DRY_RUN=1 python tools/watchdog.py 2>&1 | tee "runlogs/watchdog-$(date -u +%H%M%S).txt"
+          else
+            python tools/watchdog.py
+          fi
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          for f in watchdog-state.json runlogs; do [ -e "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet || git commit -m "Watchdog state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
