@@ -53,6 +53,6 @@ jobs:
           rm -f out.txt
           git config user.name "mrmarketcap"
           git config user.email "noreply@anthropic.com"
-          git add market-state.json alerts runlogs || true
+          for f in market-state.json alerts runlogs; do [ -e "$f" ] && git add "$f"; done; true
           git diff --cached --quiet || git commit -m "Market alert state"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
