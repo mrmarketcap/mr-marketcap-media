@@ -2,6 +2,7 @@ name: market-alerts
 on:
   schedule:
     - cron: "5 6 * * *"          # daily Fear & Greed (06:05 UTC = 10:05 Tbilisi)
+    - cron: "5 9 * * *"          # retry later the same day if the first try had no data yet
     - cron: "7,22,37,52 * * * *" # big 1-hour moves of major coins
   workflow_dispatch:
     inputs:
@@ -21,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '5 6 * * *' && 'fng' || 'movers') }}
+      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || ((github.event.schedule == '5 6 * * *' || github.event.schedule == '5 9 * * *') && 'fng' || 'movers') }}
       DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +30,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Check what would be posted
+        env:
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: DRY_RUN=1 python tools/market_alerts.py "$MODE" | tee out.txt
       - name: Install renderer (only when there is something to post)
         if: ${{ env.DRYFLAG != 'true' && hashFiles('out.txt') != '' }}
@@ -42,6 +45,7 @@ jobs:
         if: ${{ env.POST == '1' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: python tools/market_alerts.py "$MODE"
       - name: Save state
         if: ${{ always() }}

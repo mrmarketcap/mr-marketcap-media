@@ -46,9 +46,33 @@ def post(cmd, caption, name):
     print("sent", caption, r.json()["result"]["message_id"])
 
 
-def fng(fetch=get):
+def _ts(v):
+    if isinstance(v, (int, float)) or str(v).isdigit():
+        return int(v)
+    return int(dt.datetime.fromisoformat(str(v).replace("Z", "+00:00")).timestamp())
+
+
+def cmc_fng():
+    """CoinMarketCap Fear & Greed (official API, needs a free key in CMC_API_KEY). Newest first."""
+    key = os.environ.get("CMC_API_KEY")
+    if not key:
+        print("CMC_API_KEY missing; not posting (the user wants CoinMarketCap's index)")
+        return None
+    req = urllib.request.Request("https://pro-api.coinmarketcap.com/v3/fear-and-greed/historical?limit=10",
+                                 headers={"X-CMC_PRO_API_KEY": key, "Accept": "application/json",
+                                          "User-Agent": "mrmarketcap-alerts"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        rows = json.load(r)["data"]
+    rows = sorted(rows, key=lambda x: _ts(x["timestamp"]), reverse=True)
+    return [{"value": str(int(x["value"])), "value_classification": x["value_classification"],
+             "timestamp": str(_ts(x["timestamp"]))} for x in rows]
+
+
+def fng(fetch=None):
     s = load()
-    d = fetch("https://api.alternative.me/fng/?limit=8")["data"]
+    d = fetch("x")["data"] if fetch else cmc_fng()
+    if not d:
+        return None
     today = dt.datetime.utcfromtimestamp(int(d[0]["timestamp"])).strftime("%Y-%m-%d")
     if s.get("fng_date") == today:
         print("fng already posted for", today)
