@@ -98,4 +98,8 @@ def run(now=None, runs_for=gh_runs):
 
 
 if __name__ == "__main__":
-    run()
+    if os.environ.get("WATCHDOG_TEST") == "1":
+        send("✅ نگهبان آقای مارکت‌کپ فعاله. از این به بعد فقط وقتی مشکلی باشه پیام می‌دم.")
+        print("test message sent")
+    else:
+        run()

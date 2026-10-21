@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       dry:
-        description: "true = print only, send nothing"
+        description: "true = print only, test = send a test message, false = normal"
         default: "true"
 permissions:
   contents: write
@@ -30,7 +30,9 @@ jobs:
       - run: pip install requests
       - name: Watch
         run: |
-          if [ "$DRYFLAG" = "true" ]; then
+          if [ "$DRYFLAG" = "test" ]; then
+            WATCHDOG_TEST=1 python tools/watchdog.py
+          elif [ "$DRYFLAG" = "true" ]; then
             mkdir -p runlogs
             DRY_RUN=1 python tools/watchdog.py 2>&1 | tee "runlogs/watchdog-$(date -u +%H%M%S).txt"
           else
