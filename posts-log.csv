@@ -1,2 +1,5 @@
 date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reported,status
 2026-10-20,WLD,101,0.537,0.586,0.460,daily,,open
+2026-10-21,BTC,105,82734,84300,81000,daily,,open
+2026-10-21,ETH,106,2448,2540,2320,daily,,open
+2026-10-21,SOL,107,106.2,109,103,daily,,open
