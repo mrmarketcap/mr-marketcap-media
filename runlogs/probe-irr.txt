@@ -1,8 +1,37 @@
-https://call2.tgju.org/ajax.json 200 173083 price_dollar_rl":{"p":"2,694,000","h":"2,704,000","l":"2,645,600","d":"0","dp":0,"dt":"","t":"۲۹ مهر","t_en":"21 Oct","t-g":"۲۹ مهر","ts":"2026-10-21 00:00:00"},"price_dollar_future":{"p":"109,000","h":"113,000","l":"109,000","d":"0","dp":0,"dt":"","
-https://call5.tgju.org/ajax.json 200 173083 price_dollar_rl":{"p":"2,694,000","h":"2,704,000","l":"2,645,600","d":"0","dp":0,"dt":"","t":"۲۹ مهر","t_en":"21 Oct","t-g":"۲۹ مهر","ts":"2026-10-21 00:00:00"},"price_dollar_future":{"p":"109,000","h":"113,000","l":"109,000","d":"0","dp":0,"dt":"","
-https://www.tgju.org/profile/price_dollar_rl 200 1368384 price_dollar_rl"> 	<meta property="og:type" content="website"> 	<meta property="og:description" content="قیمت دلار,دلار,فیمت دلار,قبمت دلار,قسمت دلار,قمت دلار,قمیت دلار,قیت دلار,قيمت دلار,قیمت دلار,قيمت دلار امروز,قیمته دلار,قیمث دلار,قینت دلار,نرح د
-https://bonbast.com/ 200 43335 ﻿<!DOCTYPE html> <html lang="en" prefix="og: http://ogp.me/ns#">   <head>     <!-- Google tag (gtag.js) -->     <script async src="https://www.googlet
-https://api.alanchand.com/?type=currencies 401 112 {"error":"\u062a\u0648\u06a9\u0646 \u0627\u0631\u0633\u0627\u0644 \u0646\u0634\u062f\u0647 \u0627\u0633\u062a."}
-https://alanchand.com/currencies-price/usd 200 1276555 <!DOCTYPE html> <html lang="fa" dir="rtl"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0"
-https://www.bon-bast.com/ 403 5485 <!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US
-https://api.tgju.org/v1/market/indicator/summary-table-data/price_dollar_rl 200 652998 {"draw":null,"recordsTotal":3983,"recordsFiltered":3983,"data":[["2,645,650","2,645,600","2,704,000","2,694,000","<span class=\"high\" dir=\"ltr\">460
+top keys ['current', 'tolerance_low', 'tolerance_high', 'last'] 4
+current keys 1052
+price_dollar_rl {"p": "2,694,000", "h": "2,704,000", "l": "2,645,600", "d": "0", "dp": 0, "dt": "", "t": "۲۹ مهر", "t_en": "21 Oct", "t-g": "۲۹ مهر", "ts": "2026-10-21 00:00:00"}
+price_eur {"p": "3,034,500", "h": "3,035,100", "l": "2,969,600", "d": "0", "dp": 0, "dt": "", "t": "۲۹ مهر", "t_en": "21 Oct", "t-g": "۲۹ مهر", "ts": "2026-10-21 00:00:00"}
+geram18 {"p": "270,550,000", "h": "270,569,000", "l": "264,520,000", "d": "0", "dp": 0, "dt": "", "t": "۲۹ مهر", "t_en": "21 Oct", "t-g": "۲۹ مهر", "ts": "2026-10-21 00:00:00"}
+sekee {"p": "2,714,250,000", "h": "2,714,400,000", "l": "2,684,900,000", "d": "0", "dp": 0, "dt": "", "t": "۲۹ مهر", "t_en": "21 Oct", "t-g": "۲۹ مهر", "ts": "2026-10-21 00:00:00"}
+ons {"p": "4,140.26", "h": "4,141.14", "l": "4,132.59", "d": "7.37", "dp": 0.18, "dt": "high", "t": "۰۰:۲۲:۳۷", "t_en": "00:22:37", "t-g": "۰۰:۲۲:۳۷", "ts": "2026-10-22 00:22:37"}
+crypto-bitcoin {"p": "84747.26", "h": "84747.26", "l": "84542.97", "d": "182.85", "dp": 0.22, "dt": "high", "t": "۰۰:۲۳:۱۶", "t_en": "00:23:16", "t-g": "۰۰:۲۳:۱۶", "ts": "2026-10-22 00:23:16"}
+price_dollar_soleymani null
+sana_buy_usd null
+['usd_afn_bid', 'usdt-irr', 'usd-try-ask', 'usd-sek-ask', 'usd-sar-ask', 'usd-nzd-ask', 'usd-krw-ask', 'usd-jpy-ask', 'usd-cny-ask', 'usd-chf-ask', 'usd-cad-ask', 'sekee_dollar', 'price_dubai_dollar', 'price_dollar_sm', 'price_dollar_rl', 'price_dollar_future', 'price_dollar_ex', 'price_dollar_dt', 'price_dollar_afshar_future', 'price_dollar_afshar', 'ice_usd', 'ice_transfer_usd_sell', 'ice_transfer_usd_buy', 'ice_currency_usd_sell', 'ice_currency_usd_buy', 'ice_commodity_transfer_usd_sell', 'ice_commodity_transfer_usd_buy', 'ice_average_usd_sell', 'ice_average_usd_buy', 'gold_17_usd']
+{"tolerance_low": [{"name": "energy_gasoline_rbob", "item_id": 131401, "slug": "energy-gasoline-rbob", "p": "3.1312", "h": "3.1324", "l": "3.1281", "o": "3.1324", "d": "0.0044", "dp": 0.14, "dt": "low", "t": "۰۰:۲۲:۳۷", "t_en": "00:22:37", "created_at": "00:22:37", "title": "بنزین (RBOB) ", "title_en": "Gasoline RBOB", "php:first-price": "3.1324"}, {"name": "usd-jpy-ask", "item_id": 136614, "slug": "usd-jpy-ask", "p": "158.12", "h": "158.15", "l": "158.12", "o": "158.14", "d": "0.05", "dp": 0.03, "dt": "low", "t": "۰۰:۲۳:۳۳", "t_en": "00:23:33", "created_at": "00:23:33", "title": "دلار / ین ژا
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۷,۱۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۵,۵۰۰
+alanchand ۲۷۱,۹۰۰
+alanchand ۲۶۱,۰۰۰
+alanchand ۲۷۱,۹۰۰
+alanchand ۲۳۰,۷۰۰
+alanchand ۲۷۳,۱۰۰
+alanchand ۱۰۶,۷۵۰
+alanchand ۲۷۳,۱۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۶۹,۸۰۰
+alanchand ۲۷۱,۹۰۰
+alanchand ۲۶۵,۵۰۰
+alanchand 110,000
+alanchand ۱۲۶,۹۶۰
