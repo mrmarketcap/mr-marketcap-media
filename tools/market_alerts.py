@@ -33,10 +33,10 @@ def save(s):
     json.dump(s, open(STATE, "w"), indent=1)
 
 
-def post(pill, big, sub, tone, caption, name):
+def post(cmd, caption, name):
     out = os.path.join(ROOT, "alerts", "market", name + ".jpg")
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "stat_banner.py"), pill, big, sub, tone, out], check=True)
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", cmd[0])] + cmd[1:] + [out], check=True)
     import requests
     with open(out, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
@@ -48,20 +48,21 @@ def post(pill, big, sub, tone, caption, name):
 
 def fng(fetch=get):
     s = load()
-    d = fetch("https://api.alternative.me/fng/?limit=2")["data"]
+    d = fetch("https://api.alternative.me/fng/?limit=8")["data"]
     today = dt.datetime.utcfromtimestamp(int(d[0]["timestamp"])).strftime("%Y-%m-%d")
     if s.get("fng_date") == today:
         print("fng already posted for", today)
         return None
     val, label = int(d[0]["value"]), d[0]["value_classification"]
-    prev = int(d[1]["value"]) if len(d) > 1 else None
-    sub = f"{label} · yesterday {prev}" if prev is not None else label
+    y = d[1] if len(d) > 1 else d[0]
+    w = d[7] if len(d) > 7 else d[-1]
     tone = "up" if val >= 55 else "down" if val <= 45 else "flat"
     cap = f"{'🟢' if tone == 'up' else '🔴' if tone == 'down' else '🟠'} Fear & Greed Index: {val} ({label}) @Mr_marketcap"
     print(cap)
     if DRY:
         return cap
-    post("FEAR & GREED", str(val), sub, tone, cap, f"fng-{today}")
+    post(["fng_banner.py", str(val), label, y["value"], y["value_classification"], w["value"],
+          w["value_classification"]], cap, f"fng-{today}")
     s["fng_date"] = today
     save(s)
     return cap
@@ -100,7 +101,7 @@ def movers(now=None, fetch=get):
         out.append(cap)
         if DRY:
             continue
-        post(c, f"{pct:+.1f}%", f"last 1h · {price}", "up" if up else "down", cap,
+        post(["stat_banner.py", c, f"{pct:+.1f}%", f"last 1h · {price}", "up" if up else "down"], cap,
              f"move-{c.lower()}-{dt.datetime.utcfromtimestamp(now).strftime('%Y%m%d-%H%M')}")
         s["movers"][c] = now
         save(s)
