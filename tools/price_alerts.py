@@ -9,7 +9,7 @@ import json, os, subprocess, sys, time, urllib.request, datetime as dt
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "price-alerts-state.json")
 PENDING = os.path.join(ROOT, "pending.json")
-STEPS = {"BTC": 500, "ETH": 200}
+STEPS = {"BTC": 500, "ETH": 100}
 CHAT = "@Mr_marketcap"
 WINDOW = 1200      # look back at most 20 minutes
 DAILY_CAP = 8
