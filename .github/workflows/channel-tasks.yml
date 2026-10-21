@@ -1,0 +1,48 @@
+name: channel-tasks
+on:
+  schedule:
+    - cron: "41 16 * * *"        # follow-up replies to earlier analyses (daily)
+    - cron: "7 12-19 * * 4"      # YouTube new-video check (Thursdays, hourly)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "followups or youtube"
+        default: "followups"
+      dry:
+        description: "true = print only, do not post"
+        default: "true"
+permissions:
+  contents: write
+concurrency:
+  group: channel-tasks
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '41 16 * * *' && 'followups' || 'youtube') }}
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Run
+        run: |
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            DRY_RUN=1 python tools/$( [ "$MODE" = youtube ] && echo youtube_announce || echo followups ).py 2>&1 | tee "runlogs/$MODE-$(date -u +%H%M%S).txt"
+          else
+            python tools/$( [ "$MODE" = youtube ] && echo youtube_announce || echo followups ).py
+          fi
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          git add posts-log.csv youtube-posted.csv runlogs || true
+          git diff --cached --quiet || git commit -m "Channel task state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done

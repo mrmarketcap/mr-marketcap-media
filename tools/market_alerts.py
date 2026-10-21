@@ -117,5 +117,118 @@ def movers(now=None, fetch=get):
     return out
 
 
+def daily_candles(sym, now, fetch=get, pages=3):
+    """Completed daily candles (oldest first) going back up to ~12 years, 1500 per KuCoin page."""
+    rows, end = [], now
+    for _ in range(pages):
+        start = end - 1500 * 86400
+        page = fetch(f"https://api.kucoin.com/api/v1/market/candles?type=1day&symbol={sym}&startAt={start}&endAt={end}")["data"]
+        if not page:
+            break
+        rows += page
+        end = start - 1
+    today0 = now - now % 86400
+    seen = {int(r[0]): r for r in rows if int(r[0]) < today0}
+    return [seen[k] for k in sorted(seen)]
+
+
+def records(now=None, fetch=get):
+    """New 30-day / 52-week / all-time highs and 30-day / 52-week lows for BTC and ETH (once per kind per UTC day)."""
+    now = int(now or time.time())
+    s = load()
+    s.setdefault("records", {})
+    day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+    out = []
+    for coin in ("BTC", "ETH"):
+        sym = f"{coin}-USDT"
+        p = fetch(f"https://api.kucoin.com/api/v1/market/orderbook/level1?symbol={sym}")["data"]
+        if abs(now - p["time"] / 1000) > 180:
+            print(coin, "price stale; skipped")
+            continue
+        price = float(p["price"])
+        cs = daily_candles(sym, now, fetch)
+        if len(cs) < 400:
+            print(coin, "not enough history; skipped")
+            continue
+        def win(n):
+            w = cs[-n:]
+            return max(float(c[3]) for c in w), min(float(c[4]) for c in w)
+        hi_all = max(float(c[3]) for c in cs)
+        hi30, lo30 = win(30)
+        hi365, lo365 = win(365)
+        found = []   # strongest first
+        if price > hi_all and len(cs) >= 1400:
+            found.append(("ath", "new all-time high", "up"))
+        if price > hi365:
+            found.append(("hi365", "new 52-week high", "up"))
+        if price > hi30:
+            found.append(("hi30", "new 30-day high", "up"))
+        if price < lo365:
+            found.append(("lo365", "new 52-week low", "down"))
+        if price < lo30:
+            found.append(("lo30", "new 30-day low", "down"))
+        for kind, label, tone in found:
+            if s["records"].get(f"{coin}-{kind}") == day:
+                continue
+            val = f"${price:,.0f}"
+            cap = f"{'🟢' if tone == 'up' else '🔴'} #{coin} {label}: {val} @Mr_marketcap"
+            print(cap)
+            out.append(cap)
+            if not DRY:
+                post(["stat_banner.py", coin, val, label[4:].capitalize() if label.startswith("new ") else label, tone],
+                     cap, f"record-{coin.lower()}-{kind}-{dt.datetime.utcfromtimestamp(now).strftime('%Y%m%d-%H%M')}")
+                s["records"][f"{coin}-{kind}"] = day
+                save(s)
+            break   # one banner per coin per run (the strongest)
+        if not found:
+            print(coin, f"{price:,.0f} no record")
+    return out
+
+
+SUMMARY_COINS = ["BTC", "ETH", "BNB", "XRP", "SOL", "ADA", "TRX", "LINK", "AVAX", "DOT", "TON", "LTC", "BCH",
+                 "ATOM", "UNI", "AAVE", "NEAR", "ETC", "XLM", "HBAR"]
+
+
+def summary(now=None, fetch=get):
+    now = int(now or time.time())
+    s = load()
+    day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+    if s.get("summary_date") == day:
+        print("summary already posted for", day)
+        return None
+    tick = {t["symbol"]: t for t in fetch("https://api.kucoin.com/api/v1/market/allTickers")["data"]["ticker"]}
+    data = {}
+    for c in SUMMARY_COINS:
+        t = tick.get(f"{c}-USDT")
+        if t and t.get("changeRate") is not None and t.get("last"):
+            data[c] = (float(t["changeRate"]) * 100, float(t["last"]))
+    if len(data) < 10:
+        print("not enough tickers; skipped")
+        return None
+    rank = sorted(((c, v[0]) for c, v in data.items()), key=lambda x: -x[1])
+    gain = [[c, round(p, 1)] for c, p in rank[:5]]
+    lose = [[c, round(p, 1)] for c, p in rank[::-1][:5]]
+    head = " · ".join(f"{c} ${data[c][1]:,.0f} {data[c][0]:+.1f}%" for c in ("BTC", "ETH") if c in data)
+    cap = (f"📊 Market summary, last 24h: #{gain[0][0]} {gain[0][1]:+.1f}% on top, "
+           f"#{lose[0][0]} {lose[0][1]:+.1f}% at the bottom @Mr_marketcap")
+    print(cap, "|", head)
+    if DRY:
+        return cap
+    out = os.path.join(ROOT, "alerts", "market", f"summary-{day}.jpg")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "summary_banner.py"),
+                    json.dumps({"head": head, "gain": gain, "lose": lose}), out], check=True)
+    import requests
+    with open(out, "rb") as f:
+        r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
+                          data={"chat_id": CHAT, "caption": cap, "disable_notification": "true"},
+                          files={"photo": f}, timeout=60)
+    r.raise_for_status()
+    print("sent", r.json()["result"]["message_id"])
+    s["summary_date"] = day
+    save(s)
+    return cap
+
+
 if __name__ == "__main__":
-    {"fng": fng, "movers": movers}[sys.argv[1]]()
+    {"fng": fng, "movers": movers, "records": records, "summary": summary}[sys.argv[1]]()

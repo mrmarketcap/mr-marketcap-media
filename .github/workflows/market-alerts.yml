@@ -3,11 +3,12 @@ on:
   schedule:
     - cron: "5 6 * * *"          # daily Fear & Greed (06:05 UTC = 10:05 Tbilisi)
     - cron: "5 9 * * *"          # retry later the same day if the first try had no data yet
-    - cron: "7,22,37,52 * * * *" # big 1-hour moves of major coins
+    - cron: "3 14 * * *"         # daily market summary (14:03 UTC)
+    - cron: "7,22,37,52 * * * *" # big 1-hour moves + price records
   workflow_dispatch:
     inputs:
       mode:
-        description: "fng or movers"
+        description: "any of: fng movers records summary (space separated)"
         default: "movers"
       dry:
         description: "true = print only, do not post"
@@ -22,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || ((github.event.schedule == '5 6 * * *' || github.event.schedule == '5 9 * * *') && 'fng' || 'movers') }}
+      MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || (github.event.schedule == '3 14 * * *' && 'summary' || ((github.event.schedule == '5 6 * * *' || github.event.schedule == '5 9 * * *') && 'fng' || 'movers records')) }}
       DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +31,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Check what would be posted
-        env:
-        run: DRY_RUN=1 python tools/market_alerts.py "$MODE" | tee out.txt
+        run: |
+          for m in $MODE; do DRY_RUN=1 python tools/market_alerts.py "$m" 2>&1 | tee -a out.txt; done
+          if [ "$DRYFLAG" = "true" ]; then mkdir -p runlogs; cp out.txt "runlogs/market-$(date -u +%H%M%S).txt"; fi
       - name: Install renderer (only when there is something to post)
         if: ${{ env.DRYFLAG != 'true' && hashFiles('out.txt') != '' }}
         run: |
@@ -44,13 +46,13 @@ jobs:
         if: ${{ env.POST == '1' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python tools/market_alerts.py "$MODE"
+        run: for m in $MODE; do python tools/market_alerts.py "$m"; done
       - name: Save state
         if: ${{ always() }}
         run: |
           rm -f out.txt
           git config user.name "mrmarketcap"
           git config user.email "noreply@anthropic.com"
-          git add market-state.json alerts || true
+          git add market-state.json alerts runlogs || true
           git diff --cached --quiet || git commit -m "Market alert state"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
