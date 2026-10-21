@@ -31,7 +31,6 @@ jobs:
           python-version: "3.12"
       - name: Check what would be posted
         env:
-          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: DRY_RUN=1 python tools/market_alerts.py "$MODE" | tee out.txt
       - name: Install renderer (only when there is something to post)
         if: ${{ env.DRYFLAG != 'true' && hashFiles('out.txt') != '' }}
@@ -45,7 +44,6 @@ jobs:
         if: ${{ env.POST == '1' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: python tools/market_alerts.py "$MODE"
       - name: Save state
         if: ${{ always() }}

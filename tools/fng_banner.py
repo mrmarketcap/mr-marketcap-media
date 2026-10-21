@@ -36,6 +36,7 @@ html,body {{ margin:0; background:#0E0E10; }}
 .k {{ font-size:28px; color:#9a9aa0; }} .l {{ font-size:34px; font-weight:700; margin-top:4px; }} .v {{ font-size:70px; font-weight:700; }}
 .sep {{ position:absolute; left:720px; width:440px; top:315px; height:1px; background:#2a2a2e; }}
 #bar {{ position:absolute; left:50%; bottom:112px; width:72px; height:5px; margin-left:-36px; background:#F7931A; border-radius:2px; }}
+#src {{ position:absolute; left:40px; bottom:20px; font-size:20px; color:#6a6a70; }}
 #sig {{ position:absolute; left:0; right:0; bottom:20px; text-align:center; }}
 #sig .w {{ font-weight:700; font-size:36px; letter-spacing:12px; color:#f1f1f3; padding-left:12px; }}
 #sig .h {{ font-size:22px; color:#9a9aa0; margin-top:6px; }}
@@ -50,6 +51,7 @@ html,body {{ margin:0; background:#0E0E10; }}
 <div id="num">{val}</div><div id="lab">{html.escape(label)}</div>
 {row(185, "Yesterday", yv, yl)}<div class="sep"></div>{row(335, "Last Week", wv, wl)}
 <div id="bar"></div>
+<div id="src">Source: alternative.me</div>
 <div id="sig"><div class="w">MR_MARKETCAP</div><div class="h">t.me/Mr_marketcap</div></div>
 </div></body></html>"""
 
