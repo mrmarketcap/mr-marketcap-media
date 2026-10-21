@@ -1,4 +1,4 @@
-"""Free-market US dollar price in Iran (toman) for @Mr_marketcap. One silent post per day.
+"""Free-market US dollar, 18k gold gram and Emami coin in Iran (toman), one banner for @Mr_marketcap. One silent post per day.
 Source: TGJU public JSON, cross-checked against AlanChand (must agree within 2%) before posting.
 Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1). State: irr-state.json
 """
@@ -17,15 +17,33 @@ def pdig(x):
     return str(x).translate(DIG)
 
 
+def num(m):
+    return int(m.group(1).translate(FROM).replace(",", ""))
+
+
 def sources():
+    """Returns {name: (tgju_toman, alanchand_toman)} for usd, gold18 (gram), coin (Emami)."""
     import requests
-    d = requests.get("https://call2.tgju.org/ajax.json", headers=H, timeout=25).json()
-    e = d["current"]["price_dollar_rl"]
-    tgju = int(e["p"].replace(",", "")) // 10          # rial -> toman
+    d = requests.get("https://call2.tgju.org/ajax.json", headers=H, timeout=25).json()["current"]
+    tg = {"usd": int(d["price_dollar_rl"]["p"].replace(",", "")) // 10,
+          "gold18": int(d["geram18"]["p"].replace(",", "")) // 10,
+          "coin": int(d["sekee"]["p"].replace(",", "")) // 10}
+    out = {}
     html = requests.get("https://alanchand.com/currencies-price/usd", headers=H, timeout=25).text
-    m = re.search(r"[۰-۹]{3},[۰-۹]{3}", html)
-    alan = int(m.group(0).translate(FROM).replace(",", "")) if m else None
-    return tgju, alan, e.get("ts")
+    m = re.search(r"([۰-۹]{3},[۰-۹]{3})", html)
+    out["usd"] = (tg["usd"], num(m) if m else None)
+    g = requests.get("https://alanchand.com/gold-price", headers=H, timeout=25).text
+    g = re.sub(r"<script.*?</script>|<style.*?</style>", "", g, flags=re.S)
+    g = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", g))
+    m = re.search(r"گرم طلای 18 عیار ([۰-۹]{2},[۰-۹]{3},[۰-۹]{3})", g)
+    out["gold18"] = (tg["gold18"], num(m) if m else None)
+    m = re.search(r"سکه امامی \(طرح جدید\) ([۰-۹]{3},[۰-۹]{3},[۰-۹]{3})", g)
+    out["coin"] = (tg["coin"], num(m) if m else None)
+    return out
+
+
+STEP = {"usd": 100, "gold18": 1000, "coin": 100000}
+LABEL = {"gold18": "طلای ۱۸ عیار (گرم)", "coin": "سکه امامی"}
 
 
 def run(fetch=sources, now=None):
@@ -38,25 +56,32 @@ def run(fetch=sources, now=None):
     if s.get("date") == day:
         print("already posted for", day)
         return None
-    tgju, alan, ts = fetch()
-    print("tgju", tgju, ts, "alanchand", alan)
-    if not alan or abs(tgju / alan - 1) > 0.02:
-        print("sources missing or disagree; skipped")
+    src = fetch()
+    price, ch = {}, {}
+    for k, (a, b) in src.items():
+        print(k, "tgju", a, "alanchand", b)
+        if not b or abs(a / b - 1) > 0.03:        # AlanChand is live; TGJU may lag
+            print(k, "sources missing or disagree; skipped")
+            continue
+        price[k] = round((a + b) / 2 / STEP[k]) * STEP[k]
+        old = s.get("prices", {}).get(k)
+        ch[k] = (price[k] / old - 1) * 100 if old else None
+    if "usd" not in price:
+        print("no dollar price; nothing posted")
         return None
-    price = round((tgju + alan) / 2, -2)          # average of the two, nearest 100 toman
-    prev = s.get("price")
-    ch = (price / prev - 1) * 100 if prev else None
-    tone = "flat" if ch is None or abs(ch) < 0.05 else ("up" if ch > 0 else "down")
-    big = f"{int(price):,}"
-    sub = "تومان" if ch is None else f"تومان · {ch:+.1f}% نسبت به دیروز" if tone != "flat" else "تومان · تقریباً بدون تغییر"
+    c = ch["usd"]
+    tone = "flat" if c is None or abs(c) < 0.05 else ("up" if c > 0 else "down")
+    sub = "تومان" if c is None else (f"تومان · {c:+.1f}% نسبت به دیروز" if tone != "flat" else "تومان · تقریباً بدون تغییر")
+    rows = [{"label": LABEL[k], "value": f"{price[k]:,}", "ch": ch[k]} for k in ("gold18", "coin") if k in price]
     emoji = {"up": "🟢", "down": "🔴", "flat": "🟠"}[tone]
-    cap = f"{emoji} دلار آزاد: {pdig(big)} تومان @Mr_marketcap"
-    print(cap, "|", sub)
+    cap = f"{emoji} دلار آزاد: {pdig(format(price['usd'], ','))} تومان @Mr_marketcap"
+    print(cap, "|", sub, "|", rows)
     if DRY:
         return cap
     out = os.path.join(ROOT, "alerts", "irr", f"usd-{day}.jpg")
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "irr_banner.py"), "دلار آزاد", big, sub, tone, out], check=True)
+    data = {"big": f"{price['usd']:,}", "sub": sub, "tone": tone, "rows": rows}
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "irr_banner.py"), json.dumps(data, ensure_ascii=False), out], check=True)
     import requests
     with open(out, "rb") as f:
         r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendPhoto",
@@ -64,7 +89,9 @@ def run(fetch=sources, now=None):
                           files={"photo": f}, timeout=60)
     r.raise_for_status()
     print("sent", r.json()["result"]["message_id"])
-    json.dump({"date": day, "price": price}, open(STATE, "w"))
+    prices = dict(s.get("prices", {}))
+    prices.update(price)
+    json.dump({"date": day, "prices": prices}, open(STATE, "w"))
     return cap
 
 
