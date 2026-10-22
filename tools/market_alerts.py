@@ -320,14 +320,14 @@ def poll(now=None, fetch=get):
                 print("stopPoll failed", e)
         word = "بالاتر" if up else "پایین‌تر"
         text = (f"📊 نتیجهٔ نظرسنجی هفتهٔ پیش\n"
-                f"قیمت BTC موقع نظرسنجی {pdig(format(round(old['price']), ','))} دلار بود و الان {pdig(format(round(price), ','))} دلاره "
+                f"قیمت BTC موقع نظرسنجی {pdig(format(round(old['price']), ','))} بود و الان {pdig(format(round(price), ','))} شده "
                 f"({pdig(format(abs(ch), '.1f'))}٪ {'بالاتر' if up else 'پایین‌تر'})، پس جواب «{word}» درست بود.{share}\n"
                 f"@Mr_marketcap")
         lines.append(text)
         if not DRY:
             tg("sendMessage", chat_id=CHAT, text=bold_first(text), parse_mode="HTML", reply_to_message_id=old["msg"], disable_notification="true")
     ref = round(price, -2)
-    question = f"تا دوشنبهٔ بعد، BTC بالاتر از {pdig(format(int(ref), ','))} دلار هست؟"
+    question = f"تا دوشنبهٔ بعد، BTC بالاتر از {pdig(format(int(ref), ','))} هست؟"
     lines.append("new poll: " + question)
     print("\n".join(lines) + "\n@Mr_marketcap")
     if DRY:
