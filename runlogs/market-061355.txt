@@ -1,0 +1,4 @@
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:61: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  today = dt.datetime.utcfromtimestamp(int(d[0]["timestamp"])).strftime("%Y-%m-%d")
+🟢 Fear & Greed Index: 68 (Greed)
+@Mr_marketcap
