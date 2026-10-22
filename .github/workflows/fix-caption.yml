@@ -1,0 +1,33 @@
+name: fix-caption
+on:
+  workflow_dispatch:
+    inputs:
+      msg:
+        default: "160"
+      apply:
+        default: "true"
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      MSG_ID: ${{ github.event.inputs.msg }}
+      APPLY: ${{ github.event.inputs.apply }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_OWNER_CHAT_ID: ${{ secrets.TELEGRAM_OWNER_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: |
+          mkdir -p runlogs
+          python tools/fix_caption.py 2>&1 | tee runlogs/fix-caption.txt
+      - if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"; git config user.email "noreply@anthropic.com"
+          git add runlogs; git commit -qm "fix-caption log" || exit 0
+          git pull -q --rebase origin main; git push -q origin HEAD:main
