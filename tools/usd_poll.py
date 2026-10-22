@@ -59,13 +59,13 @@ def run(now=None, price_fn=usd_now):
                 print("stopPoll failed", e)
         word = "بالاتر" if up else "پایین‌تر"
         text = ("📊 نتیجهٔ نظرسنجی دلار هفتهٔ پیش\n"
-                f"قیمت دلار موقع نظرسنجی {pdig(format(old['price'], ','))} تومان بود و الان {pdig(format(price, ','))} تومانه "
+                f"قیمت دلار موقع نظرسنجی {pdig(format(old['price'], ','))} بود و الان {pdig(format(price, ','))} شده "
                 f"({pdig(format(abs(ch), '.1f'))}٪ {word})، پس جواب «{word}» درست بود.{share}\n@Mr_marketcap")
         lines.append(text)
         if not DRY:
             tg("sendMessage", chat_id=CHAT, text=bold_first(text), parse_mode="HTML",
                reply_to_message_id=old["msg"], disable_notification="true")
-    question = f"تا شنبهٔ بعد، دلار بالاتر از {pdig(format(price, ','))} تومان هست؟"
+    question = f"تا شنبهٔ بعد، دلار بالاتر از {pdig(format(price, ','))} هست؟"
     lines.append("new poll: " + question)
     print("\n".join(lines))
     if DRY:
