@@ -42,7 +42,7 @@ html,body {{ margin:0; background:#0E0E10; }}
 <div id="head">{html.escape(d["head"])}</div>
 <div class="col" style="left:80px"><div class="h">TOP GAINERS</div>{rows(d["gain"])}</div>
 <div class="col" style="left:680px"><div class="h">TOP LOSERS</div>{rows(d["lose"])}</div>
-<div id="bar"></div><div id="src">Source: KuCoin</div>
+<div id="bar"></div>
 <div id="sig"><div class="w">MR_MARKETCAP</div><div class="h2">t.me/Mr_marketcap</div></div>
 </div></body></html>"""
 
