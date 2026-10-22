@@ -1,0 +1,53 @@
+name: fix-irr
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_OWNER_CHAT_ID: ${{ secrets.TELEGRAM_OWNER_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: |
+          mkdir -p runlogs
+          python - > runlogs/fix-irr.txt 2>&1 <<'PY'
+          import os, sys, json, time, datetime as dt, requests
+          os.environ["DRY_RUN"] = "1"
+          sys.path.insert(0, "tools")
+          import irr_post as m
+          from tgfmt import bold_first
+          tok, owner = os.environ["TELEGRAM_BOT_TOKEN"], os.environ["TELEGRAM_OWNER_CHAT_ID"]
+          api = lambda meth, **d: requests.post(f"https://api.telegram.org/bot{tok}/{meth}", data=d, timeout=30).json()
+          st = json.load(open("irr-state.json"))
+          text = m.run(now=dt.datetime(2026, 10, 23, 8, tzinfo=dt.timezone.utc))
+          print("NEW TEXT:\n" + str(text))
+          fresh = m.sources()
+          found = None
+          for mid in range(150, 185):
+              r = api("forwardMessage", chat_id=owner, from_chat_id="@Mr_marketcap", message_id=mid, disable_notification="true")
+              if r.get("ok"):
+                  t = r["result"].get("text", "")
+                  api("deleteMessage", chat_id=owner, message_id=r["result"]["message_id"])
+                  print(mid, t[:30].replace("\n", " | "))
+                  if t.startswith("💵 قیمت امروز بازار آزاد") and not found:
+                      found = mid
+          print("FOUND", found)
+          if found and text:
+              r = api("editMessageText", chat_id="@Mr_marketcap", message_id=found, text=bold_first(text), parse_mode="HTML")
+              print("EDIT", r.get("ok"), r.get("description"))
+              if r.get("ok"):
+                  pr = {}
+                  for k, (a, b) in fresh.items():
+                      if b and abs(a / b - 1) <= 0.02:
+                          pr[k] = round(b / m.STEP[k]) * m.STEP[k]
+                  st["prices"].update(pr)
+                  json.dump(st, open("irr-state.json", "w"))
+          PY
+          git config user.name mrmarketcap; git config user.email noreply@anthropic.com
+          git add runlogs/fix-irr.txt irr-state.json; git commit -qm "fix irr post"; git pull -q --rebase; git push
