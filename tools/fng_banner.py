@@ -51,7 +51,6 @@ html,body {{ margin:0; background:#0E0E10; }}
 <div id="num">{val}</div><div id="lab">{html.escape(label)}</div>
 {row(185, "Yesterday", yv, yl)}<div class="sep"></div>{row(335, "Last Week", wv, wl)}
 <div id="bar"></div>
-<div id="src">Source: alternative.me</div>
 <div id="sig"><div class="w">MR_MARKETCAP</div><div class="h">t.me/Mr_marketcap</div></div>
 </div></body></html>"""
 
