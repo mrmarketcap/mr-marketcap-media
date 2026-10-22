@@ -1,0 +1,30 @@
+name: probe
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: |
+          mkdir -p runlogs
+          python - > runlogs/probe.txt 2>&1 <<'PY'
+          import sys, re, requests
+          sys.path.insert(0, "tools")
+          import irr_post as m
+          print(m.sources())
+          d = requests.get("https://call2.tgju.org/ajax.json", headers=m.H, timeout=25).json()["current"]
+          for k in ("price_dollar_rl", "price_dollar_soleymani", "price_dollar_tehran3bze", "price_dollar_herat", "sana_sell_usd", "sana_buy_usd"):
+              print(k, d.get(k))
+          h = requests.get("https://alanchand.com/currencies-price/usd", headers=m.H, timeout=25).text
+          h = re.sub(r"<script.*?</script>|<style.*?</style>", "", h, flags=re.S)
+          h = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", h))
+          print([x for x in re.findall(r"[^ ]+ [^ ]+ [^ ]+ [۰-۹]{3},[۰-۹]{3}", h)][:25])
+          PY
+          git config user.name mrmarketcap; git config user.email noreply@anthropic.com
+          git add runlogs/probe.txt; git commit -qm "probe out"; git push
