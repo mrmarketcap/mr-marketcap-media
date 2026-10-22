@@ -1,5 +1,5 @@
 """Weekly free-market dollar poll (toman) for @Mr_marketcap, same idea as the BTC poll.
-Monday: stop last week's poll and reply under it with the outcome, then open a new poll.
+Saturday: stop last week's poll and reply under it with the outcome, then open a new poll.
 Env: TELEGRAM_BOT_TOKEN (not needed with DRY_RUN=1). State: usd-poll-state.json
 """
 import datetime as dt, json, os, sys, time
@@ -65,7 +65,7 @@ def run(now=None, price_fn=usd_now):
         if not DRY:
             tg("sendMessage", chat_id=CHAT, text=bold_first(text), parse_mode="HTML",
                reply_to_message_id=old["msg"], disable_notification="true")
-    question = f"تا دوشنبهٔ بعد، دلار بالاتر از {pdig(format(price, ','))} تومان هست؟"
+    question = f"تا شنبهٔ بعد، دلار بالاتر از {pdig(format(price, ','))} تومان هست؟"
     lines.append("new poll: " + question)
     print("\n".join(lines))
     if DRY:
