@@ -1,0 +1,44 @@
+name: usd-poll
+on:
+  schedule:
+    - cron: "35 7 * * 1"          # Monday 07:35 UTC = 11:05 Tehran
+    - cron: "35 10 * * 1"         # retry if skipped
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "true = print only, do not post"
+        default: "true"
+permissions:
+  contents: write
+concurrency:
+  group: usd-poll
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Run
+        run: |
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            DRY_RUN=1 python tools/usd_poll.py 2>&1 | tee "runlogs/usdpoll-$(date -u +%H%M%S).txt"
+          else
+            python tools/usd_poll.py
+          fi
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          for f in usd-poll-state.json alerts runlogs; do [ -e "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet || git commit -m "USD poll state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
