@@ -1,0 +1,21 @@
+name: probe
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p runlogs
+          {
+          curl -s -m 20 -A "Mozilla/5.0" https://www.federalreserve.gov/feeds/press_monetary.xml -o fed.xml -w "fed %{http_code}\n"
+          head -c 3000 fed.xml
+          echo; echo ---
+          curl -s -m 20 https://nfs.faireconomy.media/ff_calendar_thisweek.json -o ff.json
+          python3 -c "
+          import json;d=json.load(open('ff.json'));print(d[0]);print([x for x in d if x['country']=='USD' and x['impact']=='High'][:6])"
+          } > runlogs/probe.txt 2>&1
+          git config user.name mrmarketcap; git config user.email noreply@anthropic.com
+          git add runlogs/probe.txt; git commit -qm "probe out"; git push
