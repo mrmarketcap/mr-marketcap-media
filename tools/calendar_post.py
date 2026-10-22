@@ -65,6 +65,14 @@ def fetch():
     return requests.get(URL, timeout=30, headers={"User-Agent": "Mozilla/5.0"}).json()
 
 
+def fed_time(data):
+    """UTC ISO time of this week's Fed rate decision, if any."""
+    for e in data:
+        if e.get("country") == "USD" and e.get("impact") == "High" and "federal funds rate" in e.get("title", "").lower():
+            return e["date"] and dt.datetime.fromisoformat(e["date"]).astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return None
+
+
 def build(data):
     seen, by_day = set(), {}
     for e in data:
@@ -103,7 +111,8 @@ def run(now=None, data=None):
     if s.get("week") == wk:
         print("already posted for", wk)
         return None
-    text = build(data if data is not None else fetch())
+    data = data if data is not None else fetch()
+    text = build(data)
     if not text:
         print("no major events this week; nothing posted")
         return None
@@ -114,8 +123,13 @@ def run(now=None, data=None):
     r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
                       data={"chat_id": CHAT, "text": bold_first(text), "parse_mode": "HTML", "disable_notification": "true"}, timeout=60)
     r.raise_for_status()
-    print("sent", r.json()["result"]["message_id"])
-    json.dump({"week": wk}, open(STATE, "w"))
+    mid = r.json()["result"]["message_id"]
+    print("sent", mid)
+    st = {"week": wk, "msg": mid}
+    ft = fed_time(data)
+    if ft:
+        st["fed_utc"] = ft
+    json.dump(st, open(STATE, "w"))
     return text
 
 

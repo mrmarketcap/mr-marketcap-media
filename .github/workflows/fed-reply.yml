@@ -1,0 +1,43 @@
+name: fed-reply
+on:
+  schedule:
+    - cron: "*/10 * * * 2-4"      # Tue-Thu every ~10 min; the script only acts in the hours after the Fed decision time
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "true = parser self-test on the September statement"
+        default: "true"
+permissions:
+  contents: write
+concurrency:
+  group: fed-reply
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DRYFLAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Run
+        run: |
+          if [ "$DRYFLAG" = "true" ]; then
+            mkdir -p runlogs
+            FED_SELFTEST=1 python tools/fed_reply.py 2>&1 | tee runlogs/fed-selftest.txt
+          else
+            python tools/fed_reply.py
+          fi
+      - name: Save state
+        if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"
+          git config user.email "noreply@anthropic.com"
+          for f in calendar-state.json runlogs; do [ -e "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet || git commit -m "Fed reply state"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
