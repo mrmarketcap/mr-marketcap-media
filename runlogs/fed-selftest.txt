@@ -1,3 +1,17 @@
 selftest: ('raise', 3.75, 4.0) 🏛 نتیجهٔ تصمیم فدرال رزرو
 نرخ بهره افزایش پیدا کرد و الان بین ۳٫۷۵ تا ۴٫۰۰ درصده.
+
+📌 اثر روی بازارها
+افزایش نرخ بهره معمولاً پول و وام رو گرون‌تر می‌کنه. بیشتر وقت‌ها به سهام و کریپتو و طلا فشار میاره و دلار رو قوی‌تر می‌کنه. ولی اگه بازار از قبل انتظارش رو داشته، اثرش می‌تونه کمتر باشه.
 @Mr_marketcap
+Traceback (most recent call last):
+  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 123, in <module>
+    print(cpi_text({"forecast": "0.3%"})[0])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 62, in cpi_text
+    sa, nsa = series(SERIES["cpi_sa"], fetch), series(SERIES["cpi_nsa"], fetch)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 27, in series
+    return [(f"{r['year']}-{r['period']}", float(r["value"])) for r in rows if r["period"].startswith("M") and r["period"] != "M13"]
+                                           ^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '-'
