@@ -13,6 +13,6 @@ def rtl(text):
     return "\n".join((RLM + l) if ok(l) else l for l in text.split("\n"))
 
 
-def bold_first(text):
-    first, _, rest = rtl(text).partition("\n")
+def bold_first(text, rtl_mark=True):
+    first, _, rest = (rtl(text) if rtl_mark else text).partition("\n")
     return f"<b>{html.escape(first, quote=False)}</b>" + (("\n" + html.escape(rest, quote=False)) if rest else "")
