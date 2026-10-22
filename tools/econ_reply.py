@@ -24,7 +24,27 @@ def series(code, fetch=None):
     import requests
     j = (fetch or (lambda u: requests.get(u, timeout=30).json()))(f"https://api.bls.gov/publicAPI/v1/timeseries/data/{code}")
     rows = j["Results"]["series"][0]["data"]
-    return [(f"{r['year']}-{r['period']}", float(r["value"])) for r in rows if r["period"].startswith("M") and r["period"] != "M13"]
+    out = []
+    for r in rows:
+        try:
+            if r["period"].startswith("M") and r["period"] != "M13":
+                out.append((f"{r['year']}-{r['period']}", float(r["value"])))
+        except ValueError:          # BLS marks missing months with '-'
+            continue
+    return out
+
+
+def at(rows, period):
+    for p_, v in rows:
+        if p_ == period:
+            return v
+    raise KeyError(period)
+
+
+def shift(period, months):
+    y, m = int(period[:4]), int(period[6:])
+    n = y * 12 + (m - 1) + months
+    return f"{n // 12}-M{n % 12 + 1:02d}"
 
 
 def latest_period(kind, fetch=None):
@@ -60,17 +80,18 @@ JOBS_IMPACT = {
 
 def cpi_text(ev, fetch=None):
     sa, nsa = series(SERIES["cpi_sa"], fetch), series(SERIES["cpi_nsa"], fetch)
-    mm = round((sa[0][1] / sa[1][1] - 1) * 100, 1)
-    yy = round((nsa[0][1] / nsa[12][1] - 1) * 100, 1)
+    p0 = sa[0][0]
+    mm = round((at(sa, p0) / at(sa, shift(p0, -1)) - 1) * 100, 1)
+    yy = round((at(nsa, p0) / at(nsa, shift(p0, -12)) - 1) * 100, 1)
     f = num(ev.get("forecast"))
     c = cmp(mm, f)
     head = f"تورم ماهانه {pd(mm)}٪ شد" + (f" (پیش‌بینی {pd(f)}٪)" if f is not None else "") + f" و تورم سالانه {pd(yy)}٪."
-    return f"📈 نتیجهٔ تورم آمریکا (CPI)\n{head}\n\n📌 اثر روی بازارها\n{CPI_IMPACT[c]}\n@Mr_marketcap", sa[0][0]
+    return f"📈 نتیجهٔ تورم آمریکا (CPI)\n{head}\n\n📌 اثر روی بازارها\n{CPI_IMPACT[c]}\n@Mr_marketcap", p0
 
 
 def jobs_text(ev, fetch=None):
     j, u = series(SERIES["jobs"], fetch), series(SERIES["unemp"], fetch)
-    ch = round(j[0][1] - j[1][1])
+    ch = round(at(j, j[0][0]) - at(j, shift(j[0][0], -1)))
     f = num(ev.get("forecast"))
     c = cmp(ch, f)
     sign = "+" if ch >= 0 else "-"
