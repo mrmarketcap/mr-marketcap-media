@@ -27,7 +27,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
           pip install playwright requests
-          python -m playwright install --with-deps chromium
+          (which google-chrome >/dev/null 2>&1 || timeout 300 python -m playwright install --with-deps chromium)
           python tools/price_alerts.py test
       - name: Detect round-level crossings
         if: ${{ github.event.inputs.test != 'true' }}
@@ -36,7 +36,7 @@ jobs:
         if: ${{ hashFiles('pending.json') != '' }}
         run: |
           pip install playwright requests
-          python -m playwright install --with-deps chromium
+          (which google-chrome >/dev/null 2>&1 || timeout 300 python -m playwright install --with-deps chromium)
       - name: Render and send
         if: ${{ hashFiles('pending.json') != '' }}
         env:
