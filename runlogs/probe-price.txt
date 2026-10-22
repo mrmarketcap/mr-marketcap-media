@@ -1,0 +1,54 @@
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/probe_price.py:10: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  t = dt.datetime.utcfromtimestamp(int(r[0])).strftime("%H:%M")
+BTC-USDT price 81679.7 age_s -0.6860001087188721
+06:00 o 82823.9 h 82883.3 l 82790.9 c 82802.1
+06:15 o 82802.1 h 82826 l 82593.6 c 82593.6
+06:30 o 82593.6 h 82632.5 l 82530.9 c 82530.9
+06:45 o 82530.8 h 82580.4 l 82477.8 c 82503.6
+07:00 o 82503.6 h 82536.8 l 82304.6 c 82350.7
+07:15 o 82350.6 h 82352.7 l 82256.1 c 82290.8
+07:30 o 82283.1 h 82326.7 l 82274.3 c 82293.5
+07:45 o 82293.5 h 82341 l 82147.2 c 82244.7
+08:00 o 82232.6 h 82267.7 l 82111.3 c 82232.7
+08:15 o 82232.7 h 82232.8 l 82023.1 c 82061.1
+08:30 o 82061.1 h 82070.2 l 81888.8 c 82024.4
+08:45 o 82024.3 h 82024.3 l 81863.3 c 81864.5
+09:00 o 81864.5 h 81881.6 l 81663.2 c 81881.6
+09:15 o 81881.6 h 81931 l 81726.9 c 81772.9
+09:30 o 81772.9 h 81855.9 l 81772.8 c 81808.8
+09:45 o 81808.7 h 81947 l 81808 c 81947
+10:00 o 81947 h 82094 l 81933.9 c 82048.5
+10:15 o 82048.4 h 82093.5 l 82044 c 82044.1
+10:30 o 82044.1 h 82174.2 l 82044 c 82076.8
+10:45 o 82076.9 h 82102.9 l 82006.4 c 82040.9
+11:00 o 82041 h 82041 l 81970.9 c 81979.3
+11:15 o 81979.4 h 81999.6 l 81854.3 c 81891.4
+11:30 o 81891.4 h 81962.1 l 81849.3 c 81897.7
+11:45 o 81897.7 h 81905.6 l 81759.7 c 81759.8
+12:00 o 81759.8 h 81860.4 l 81723.7 c 81808.6
+12:15 o 81808.5 h 81904.4 l 81800 c 81852.8
+12:30 o 81852.4 h 81852.4 l 81695.3 c 81734.5
+12:45 o 81734.4 h 81784.9 l 81638.4 c 81689.9
+13:00 o 81677.7 h 81734.5 l 81596.8 c 81615.3
+13:15 o 81615.2 h 81860.1 l 81613.2 c 81845.3
+13:30 o 81842 h 82049.9 l 81569.2 c 81743.7
+13:45 o 81730.6 h 81760.9 l 81383.2 c 81679.8
+{
+ "last_run_utc": "2026-10-21T15:51:00Z",
+ "day": "2026-10-22",
+ "alerts_today": 6,
+ "BTC": {
+  "last_price": 84465,
+  "last_alert_level": 82000,
+  "last_alert_utc": "2026-10-21T15:50:00Z",
+  "alerts_today": 5,
+  "last_alert_ts": 1792657998
+ },
+ "ETH": {
+  "last_price": 2510,
+  "last_alert_level": 2400,
+  "last_alert_utc": "2026-10-21T15:50:00Z",
+  "alerts_today": 1,
+  "last_alert_ts": 1792660519
+ }
+}
