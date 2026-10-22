@@ -74,10 +74,10 @@ def run(fetch=sources, now=None):
         c = ch.get(k)
         mark = "🟠" if c is None or abs(c) < 0.05 else ("🟢" if c > 0 else "🔴")
         tail = "" if c is None else (" (تقریباً بدون تغییر)" if abs(c) < 0.05 else f" ({pdig(format(abs(c), '.1f'))}٪ {'بالاتر' if c > 0 else 'پایین‌تر'} از دیروز)")
-        return f"{mark} {emoji_name}: {pdig(format(price[k], ','))} تومان{tail}"
+        return f"{mark} {emoji_name}: {pdig(format(price[k], ','))}{tail}"
     lines = ["💵 قیمت امروز بازار آزاد", line("دلار", "usd")]
     if "gold18" in price:
-        lines.append(line("طلای ۱۸ عیار (هر گرم)", "gold18"))
+        lines.append(line("طلای ۱۸ عیار", "gold18"))
     if "coin" in price:
         lines.append(line("سکه امامی", "coin"))
     text = "\n".join(lines) + "\n@Mr_marketcap"
