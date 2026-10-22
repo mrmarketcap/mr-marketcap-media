@@ -1,7 +1,7 @@
 name: fed-reply
 on:
   schedule:
-    - cron: "*/10 * * * 2-4"      # Tue-Thu every ~10 min; the script only acts in the hours after the Fed decision time
+    - cron: "*/10 * * * 2-5"      # Tue-Fri every ~10 min; the scripts only act in the hours after an event time
   workflow_dispatch:
     inputs:
       dry:
@@ -29,9 +29,10 @@ jobs:
         run: |
           if [ "$DRYFLAG" = "true" ]; then
             mkdir -p runlogs
-            FED_SELFTEST=1 python tools/fed_reply.py 2>&1 | tee runlogs/fed-selftest.txt
+            { FED_SELFTEST=1 python tools/fed_reply.py; ECON_SELFTEST=1 python tools/econ_reply.py; } 2>&1 | tee runlogs/fed-selftest.txt
           else
             python tools/fed_reply.py
+            python tools/econ_reply.py
           fi
       - name: Save state
         if: ${{ always() }}

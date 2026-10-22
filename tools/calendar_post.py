@@ -73,6 +73,31 @@ def fed_time(data):
     return None
 
 
+def econ_events(data):
+    """CPI and jobs-report events of the week with the latest published BLS period as baseline (for the result replies)."""
+    evs = []
+    for e in data:
+        if e.get("country") != "USD" or e.get("impact") != "High":
+            continue
+        t = e.get("title", "").lower()
+        kind = "cpi" if t == "cpi m/m" else ("nfp" if t == "non-farm employment change" else None)
+        if not kind:
+            continue
+        u = dt.datetime.fromisoformat(e["date"]).astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ev = {"kind": kind, "utc": u, "forecast": e.get("forecast", "")}
+        if kind == "nfp":
+            ev["u_forecast"] = next((x.get("forecast", "") for x in data if x.get("country") == "USD" and x.get("title", "").lower() == "unemployment rate"
+                                     and x.get("date") == e.get("date")), "")
+        try:
+            import econ_reply
+            ev["base"] = econ_reply.latest_period("cpi" if kind == "cpi" else "jobs")
+        except Exception as ex:
+            print("baseline failed", kind, ex)
+            ev["base"] = None
+        evs.append(ev)
+    return evs
+
+
 def build(data):
     seen, by_day = set(), {}
     for e in data:
@@ -129,6 +154,7 @@ def run(now=None, data=None):
     ft = fed_time(data)
     if ft:
         st["fed_utc"] = ft
+    st["events"] = econ_events(data)
     json.dump(st, open(STATE, "w"))
     return text
 
