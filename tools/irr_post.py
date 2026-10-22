@@ -61,7 +61,7 @@ def run(fetch=sources, now=None):
     price, ch = {}, {}
     for k, (a, b) in src.items():
         print(k, "tgju", a, "alanchand", b)
-        if not b or abs(a / b - 1) > 0.03:        # AlanChand is live; TGJU may lag
+        if not b or abs(a / b - 1) > 0.02:        # AlanChand is live; TGJU may lag
             print(k, "sources missing or disagree; skipped")
             continue
         price[k] = round(b / STEP[k]) * STEP[k]      # live AlanChand value; TGJU only sanity-checks it

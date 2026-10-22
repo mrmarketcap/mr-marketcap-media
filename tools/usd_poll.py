@@ -24,7 +24,7 @@ def tg(method, **data):
 
 def usd_now(fetch=irr_post.sources):
     a, b = fetch()["usd"]
-    if not b or abs(a / b - 1) > 0.03:
+    if not b or abs(a / b - 1) > 0.02:
         return None
     return round(b / 1000) * 1000          # live AlanChand value, TGJU only sanity-checks it
 
