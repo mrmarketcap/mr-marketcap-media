@@ -13,6 +13,8 @@ old = cap
 new = cap.replace(RLM, "")
 new = new.replace(" وسط روز", "").replace("وسط روز ", "")
 new = re.sub(r"چرا امروز\s*[؟?]\s*", "", new)
+new = new.replace("ذره‌بین :", "ذره‌بین:")
+new = re.sub(r"\n{3,}", "\n\n", new)
 print("OLD:\n" + old + "\n\nNEW:\n" + new)
 if new != old.replace(RLM, "") and os.environ.get("APPLY") == "true":
     m = "editMessageCaption" if "caption" in f["result"] else "editMessageText"
