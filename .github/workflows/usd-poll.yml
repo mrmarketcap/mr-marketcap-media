@@ -1,7 +1,7 @@
 name: usd-poll
 on:
   schedule:
-    - cron: "30 8 * * 6"          # Saturday 08:30 UTC = 12:00 Tehran (first trading day of the week)
+    - cron: "30 9 * * 6"          # Saturday 09:30 UTC = 13:00 Tehran
     - cron: "30 11 * * 6"         # retry if skipped
   workflow_dispatch:
     inputs:

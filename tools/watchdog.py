@@ -53,7 +53,7 @@ def problems(now, runs_for=gh_runs):
         out["daily-fng"] = "⚠️ پست ترس و طمع امروز هنوز نرفته."
     if h >= 15.5 and ms.get("summary_date") != today:
         out["daily-summary"] = "⚠️ خلاصهٔ روزانهٔ بازار امروز هنوز نرفته."
-    if h >= 10.5 and irr.get("date") != today:
+    if h >= 12 and irr.get("date") != today:
         out["daily-irr"] = "⚠️ قیمت دلار، طلا و سکهٔ امروز هنوز نرفته (شاید دو منبع قیمت با هم نخونن)."
     cs = jload("content-state.json", {})
     if h >= 10.75 and cs.get("last_date") != today:

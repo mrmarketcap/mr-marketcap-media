@@ -1,8 +1,8 @@
 name: irr-post
 on:
   schedule:
-    - cron: "30 6 * * *"         # daily dollar price (06:30 UTC = 10:30 Tbilisi)
-    - cron: "30 9 * * *"         # retry if the first try was skipped
+    - cron: "0 9 * * *"           # daily dollar price (09:00 UTC = 12:30 Tehran, after the Tehran market sets the rate)
+    - cron: "0 11 * * *"          # retry if the first try was skipped (14:30 Tehran)
   workflow_dispatch:
     inputs:
       dry:
