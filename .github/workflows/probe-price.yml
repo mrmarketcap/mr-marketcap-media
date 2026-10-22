@@ -1,0 +1,22 @@
+name: probe-price
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          mkdir -p runlogs
+          python tools/probe_price.py 2>&1 | tee runlogs/probe-price.txt
+          cat price-alerts-state.json >> runlogs/probe-price.txt
+      - if: ${{ always() }}
+        run: |
+          git config user.name "mrmarketcap"; git config user.email "noreply@anthropic.com"
+          git add runlogs; git commit -qm "probe log" || exit 0
+          git pull -q --rebase origin main; git push -q origin HEAD:main
