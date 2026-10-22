@@ -10,7 +10,7 @@ assert f.get("ok"), f
 cap = f["result"].get("caption") or f["result"].get("text") or ""
 api("deleteMessage", chat_id=OWNER, message_id=f["result"]["message_id"])
 old = cap
-new = cap.replace(RLM, "")
+new = cap.replace(RLM, "").replace("\u200e", "")
 new = new.replace(" وسط روز", "").replace("وسط روز ", "")
 new = re.sub(r"چرا امروز\s*[؟?]\s*", "", new)
 new = new.replace("ذره‌بین :", "ذره‌بین:")

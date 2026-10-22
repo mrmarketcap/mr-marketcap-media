@@ -1,16 +1,22 @@
 """Telegram HTML helper: first line bold, rest escaped plain text.
-Every non-empty line (except hashtag and @channel lines) starts with an invisible RLM so lines that begin with
-Latin text (tickers, @handle, hashtags) stay right-aligned."""
-import html
+Alignment rule (from the user): a line that contains any Persian letter is right-aligned
+(invisible RLM at its start); a line with no Persian letters is left-aligned (invisible LRM)."""
+import html, re
 
 RLM = "‏"
+LRM = "‎"
+_FA = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]")
 
 
 def rtl(text):
-    def ok(l):
-        t = l.strip()
-        return bool(t) and not l.startswith(RLM) and not t.startswith(("#", "@"))   # hashtags / channel link exempt
-    return "\n".join((RLM + l) if ok(l) else l for l in text.split("\n"))
+    out = []
+    for l in text.split("\n"):
+        l = l.lstrip(RLM + LRM)
+        if not l.strip():
+            out.append(l)
+        else:
+            out.append((RLM if _FA.search(l) else LRM) + l)
+    return "\n".join(out)
 
 
 def bold_first(text, rtl_mark=True):
