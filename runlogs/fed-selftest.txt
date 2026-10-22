@@ -4,14 +4,15 @@ selftest: ('raise', 3.75, 4.0) 🏛 نتیجهٔ تصمیم فدرال رزرو
 📌 اثر روی بازارها
 افزایش نرخ بهره معمولاً پول و وام رو گرون‌تر می‌کنه. بیشتر وقت‌ها به سهام و کریپتو و طلا فشار میاره و دلار رو قوی‌تر می‌کنه. ولی اگه بازار از قبل انتظارش رو داشته، اثرش می‌تونه کمتر باشه.
 @Mr_marketcap
-Traceback (most recent call last):
-  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 123, in <module>
-    print(cpi_text({"forecast": "0.3%"})[0])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 62, in cpi_text
-    sa, nsa = series(SERIES["cpi_sa"], fetch), series(SERIES["cpi_nsa"], fetch)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/econ_reply.py", line 27, in series
-    return [(f"{r['year']}-{r['period']}", float(r["value"])) for r in rows if r["period"].startswith("M") and r["period"] != "M13"]
-                                           ^^^^^^^^^^^^^^^^^
-ValueError: could not convert string to float: '-'
+📈 نتیجهٔ تورم آمریکا (CPI)
+تورم ماهانه ۰٫۶٪ شد (پیش‌بینی ۰٫۳٪) و تورم سالانه ۳٫۷٪.
+
+📌 اثر روی بازارها
+تورم بالاتر از انتظار بوده، یعنی فدرال رزرو برای کم‌کردن نرخ بهره کمتر جا داره. معمولاً به سهام و کریپتو و طلا فشار میاره و دلار رو قوی‌تر می‌کنه.
+@Mr_marketcap
+👷 نتیجهٔ گزارش اشتغال آمریکا
+شاغلان غیرکشاورزی +۲۹ هزار نفر (پیش‌بینی ۱۵۰ هزار) و نرخ بیکاری ۴٫۲٪ (پیش‌بینی ۴٫۲٪).
+
+📌 اثر روی بازارها
+بازار کار ضعیف‌تر از انتظار بوده، یعنی احتمال کم‌کردن نرخ بهره بیشتر می‌شه. معمولاً به نفع طلا و کریپتو و ضعیف‌تر شدن دلاره؛ فقط اگه خیلی ضعیف باشه، نگرانی از رکود به سهام فشار میاره.
+@Mr_marketcap
