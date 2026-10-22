@@ -128,8 +128,9 @@ def run(now=None, fetch=get, send=None):
 
 def tg_send(reply_to, text):
     import requests, html
-    first, _, rest = text.partition("\n")
-    htext = f"<b>{html.escape(first)}</b>\n{html.escape(rest)}"      # first line bold
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from tgfmt import bold_first
+    htext = bold_first(text)      # first line bold + RTL mark on every line
     r = requests.post(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
                       json={"chat_id": CHAT, "text": htext, "parse_mode": "HTML", "reply_to_message_id": int(reply_to),
                             "disable_notification": True}, timeout=30)
