@@ -3,7 +3,7 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-21,BTC,105,82734,84300,81000,daily,,open
 2026-10-21,ETH,106,2448,2540,2320,daily,,open
 2026-10-21,SOL,107,106.2,109,103,daily,,open
-2026-10-21,COMP,110,25.85,26.88,25.60,midday,,open
+2026-10-21,COMP,110,25.85,26.88,25.60,midday,bear,open
 2026-10-21,BICO,111,0.01658,0.01770,0.01547,manual,,open
 2026-10-22,BTC,151,84100,84300,82500,daily,,open
 2026-10-22,ETH,152,2474,2580,2320,daily,,open
