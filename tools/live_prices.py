@@ -20,6 +20,15 @@ def main(coins):
            "source": "KuCoin", "coins": {}}
     for c in coins:
         sym = f"{c}-USDT"
+        try:
+            _one(c, sym, now, out)
+        except Exception as e:
+            print("skip", c, e)
+    json.dump(out, open("data/live-prices.json", "w"), indent=1)
+    print(json.dumps({k: (v["price"], v["price_time_tehran"], v["price_age_s"], len(v["candles"])) for k, v in out["coins"].items()}))
+
+def _one(c, sym, now, out):
+    if True:
         lv = get(f"/api/v1/market/orderbook/level1?symbol={sym}")
         t = lv["time"] / 1000
         rows = get(f"/api/v1/market/candles?type=1day&symbol={sym}&startAt={now-86400*36}&endAt={now}")
@@ -33,8 +42,6 @@ def main(coins):
         out["coins"][c] = {"price": float(lv["price"]),
                            "price_time_tehran": dt.datetime.fromtimestamp(t, TEHRAN).strftime("%Y-%m-%d %H:%M"),
                            "price_age_s": round(now - t), "candles": candles}
-    json.dump(out, open("data/live-prices.json", "w"), indent=1)
-    print(json.dumps({k: (v["price"], v["price_time_tehran"], v["price_age_s"], len(v["candles"])) for k, v in out["coins"].items()}))
 
 if __name__ == "__main__":
     main(sys.argv[1:] or ["BTC", "ETH"])
