@@ -1,12 +1,12 @@
 {
- "fetched_utc": "2026-10-23T05:16:38+00:00",
- "fetched_tehran": "2026-10-23 08:46",
+ "fetched_utc": "2026-10-23T05:20:51+00:00",
+ "fetched_tehran": "2026-10-23 08:50",
  "source": "KuCoin",
  "coins": {
   "BTC": {
-   "price": 81853.8,
-   "price_time_tehran": "2026-10-23 08:46",
-   "price_age_s": 1,
+   "price": 81809.4,
+   "price_time_tehran": "2026-10-23 08:50",
+   "price_age_s": 0,
    "candles": [
     {
      "date": "2026-09-18",
@@ -258,15 +258,15 @@
      "open": 81413.5,
      "high": 82021.7,
      "low": 81132.7,
-     "close": 81853.8,
+     "close": 81809.4,
      "live": true
     }
    ]
   },
   "ETH": {
-   "price": 2404.51,
-   "price_time_tehran": "2026-10-23 08:46",
-   "price_age_s": 4,
+   "price": 2401.99,
+   "price_time_tehran": "2026-10-23 08:50",
+   "price_age_s": 1,
    "candles": [
     {
      "date": "2026-09-18",
@@ -518,7 +518,7 @@
      "open": 2389.02,
      "high": 2417.11,
      "low": 2381.68,
-     "close": 2404.51,
+     "close": 2401.99,
      "live": true
     }
    ]
