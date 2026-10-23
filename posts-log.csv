@@ -9,3 +9,5 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-22,ETH,152,2474,2580,2320,daily,,open
 2026-10-22,ZEC,153,1283,1380,1250,daily,,open
 2026-10-22,XMR,160,646,650,600,midday,,open
+2026-10-23,BTC,169,81519,84900,79900,daily,,open
+2026-10-23,ETH,170,2386.19,2525,2320,daily,,open
