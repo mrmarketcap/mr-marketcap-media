@@ -13,3 +13,6 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-23,ETH,172,2401.99,2525,2320,daily,,open
 2026-10-23,AVAX,173,9.299,10.05,9.05,daily,,open
 2026-10-23,TRX,177,0.3304,0.3374,0.3261,midday,,open
+2026-10-24,BTC,185,80908,83000,79800,daily,,open
+2026-10-24,ETH,186,2383.06,2480,2317,daily,,open
+2026-10-24,LINK,187,11.8652,12.47,11.54,daily,,open
