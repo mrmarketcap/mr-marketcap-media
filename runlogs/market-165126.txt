@@ -1,0 +1,7 @@
+TON error 'data'
+no big moves
+/home/runner/work/mr-marketcap-media/mr-marketcap-media/tools/market_alerts.py:142: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  day = dt.datetime.utcfromtimestamp(now).strftime("%Y-%m-%d")
+BTC 80,150 no record
+🔴 #ETH new 30-day low: $2,314
+@Mr_marketcap
