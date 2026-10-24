@@ -16,3 +16,4 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-24,BTC,185,80908,83000,79800,daily,,open
 2026-10-24,ETH,186,2383.06,2480,2317,daily,,open
 2026-10-24,LINK,187,11.8652,12.47,11.54,daily,,open
+2026-10-24,UNI,194,6.8758,7.45,6.74,midday,,open
