@@ -12,7 +12,7 @@ CHAT = "@Mr_marketcap"
 MAX_REPLIES = 2
 MAX_AGE_DAYS = 14
 DRY = os.environ.get("DRY_RUN") == "1"
-FA = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+FA = str.maketrans("0123456789.", "۰۱۲۳۴۵۶۷۸۹٫")
 FIELDS = ["date", "ticker", "message_id", "price_at_post", "bull_trigger", "bear_trigger",
           "post_type", "reported", "status"]
 
@@ -57,27 +57,63 @@ def events_for(row, now, fetch):
     return ev, (last[0] if last else None), pct, price
 
 
+def _ago(days, p0):
+    """Spoken reference to the original post; varies with the age of the post."""
+    if days <= 0:
+        return f"از موقع تحلیل امروز ({p0})"
+    if days == 1:
+        return f"از تحلیل دیروز ({p0})"
+    return f"از تحلیل {fa(days)} روز پیش ({p0})"
+
+
 def text_for(row, ev, last, pct, now):
+    """Update reply. Wording is picked from several natural variants (seeded by the post, so a
+    re-run gives the same text) so the channel does not get the same sentences every time."""
+    import random
     t = row["ticker"]
     days = (dt.datetime.utcfromtimestamp(now).date() - dt.datetime.strptime(row["date"], "%Y-%m-%d").date()).days
     p0 = fa(row["price_at_post"])
     n = fa(abs(round(pct)))
     kind = last if ("bull" in ev or "bear" in ev) else ("bull_move" if "up20" in ev else "bear_move")
+    rnd = random.Random(f"{row['message_id']}-{kind}-{days}")
+    ago = _ago(days, p0)
+    up = rnd.choice(["رشد کرده", "بالا رفته"]) if pct >= 0 else "تغییر کرده"
+    down = rnd.choice(["ریزش کرده", "پایین اومده", "افت کرده"]) if pct <= 0 else "تغییر کرده"
+    bull, bear = fa(row["bull_trigger"]), fa(row["bear_trigger"])
     if kind == "bull":
-        body = (f"🎯 آپدیت {t}\nاز تحلیل {fa(days)} روز پیش (قیمت اون موقع {p0}) تا الان حدود {n}٪ "
-                f"{'رشد' if pct >= 0 else 'تغییر'} داشته و کندل روزانه بالای {fa(row['bull_trigger'])} بسته شده، "
-                f"یعنی سناریوی صعودی فعال شد.\nنوسان هنوز بالاست و ممکنه وضعیت سریع عوض بشه.")
+        head = rnd.choice([f"🎯 آپدیت {t}", f"🎯 خبر تازه از {t}", f"🎯 {t} سطحش رو فعال کرد"])
+        body = rnd.choice([
+            f"{ago} تا الان حدود {n}٪ {up} و کندل روزانه بالای {bull} بسته شد؛ یعنی سناریوی صعودی فعال شده.",
+            f"کندل روزانه بالای {bull} بسته شد و سناریوی صعودی فعال شد. قیمت {ago} حدود {n}٪ {up}.",
+            f"قیمت {ago.replace('از ', 'نسبت به ', 1)} حدود {n}٪ {up} و بالای {bull} کندل روزانه بسته شده. سناریوی صعودی فعال شد.",
+        ])
+        tail = rnd.choice(["", "", "فعلاً نوسان بالاست و برگشت‌های ناگهانی هم ممکنه.", "باید دید بالای این سطح می‌مونه یا نه.",
+                           "هنوز زوده که بشه گفت ادامه‌دار می‌شه."])
     elif kind == "bear":
-        body = (f"⚠️ آپدیت {t}\nاز تحلیل {fa(days)} روز پیش (قیمت اون موقع {p0}) تا الان حدود {n}٪ "
-                f"{'ریزش' if pct <= 0 else 'تغییر'} داشته و کندل روزانه زیر {fa(row['bear_trigger'])} بسته شده، "
-                f"یعنی سناریوی نزولی فعال شد.\nنوسان هنوز بالاست و ممکنه وضعیت سریع عوض بشه.")
+        head = rnd.choice([f"⚠️ آپدیت {t}", f"⚠️ خبر تازه از {t}", f"⚠️ {t} زیر سطحش بسته شد"])
+        body = rnd.choice([
+            f"{ago} تا الان حدود {n}٪ {down} و کندل روزانه زیر {bear} بسته شد؛ یعنی سناریوی نزولی فعال شده.",
+            f"کندل روزانه زیر {bear} بسته شد و سناریوی نزولی فعال شد. قیمت {ago} حدود {n}٪ {down}.",
+            f"قیمت {ago.replace('از ', 'نسبت به ', 1)} حدود {n}٪ {down} و زیر {bear} کندل روزانه بسته شده. سناریوی نزولی فعال شد.",
+        ])
+        tail = rnd.choice(["", "", "فعلاً نوسان بالاست و برگشت‌های ناگهانی هم ممکنه.", "باید دید پایین این سطح می‌مونه یا نه.",
+                           "هنوز زوده که بشه گفت ادامه‌دار می‌شه."])
     elif kind == "bull_move":
-        body = (f"🎯 آپدیت {t}\nاز تحلیل {fa(days)} روز پیش (قیمت اون موقع {p0}) تا الان حدود {n}٪ رشد کرده، "
-                f"ولی هنوز کندل روزانه‌ای بالای {fa(row['bull_trigger'])} بسته نشده و سطح کلیدی تأیید نشده.")
+        head = rnd.choice([f"🎯 آپدیت {t}", f"🎯 خبر تازه از {t}"])
+        body = rnd.choice([
+            f"{ago} تا الان حدود {n}٪ {up}، ولی هنوز کندل روزانه‌ای بالای {bull} بسته نشده و سطح کلیدی تأیید نشده.",
+            f"قیمت {ago.replace('از ', 'نسبت به ', 1)} حدود {n}٪ {up}. فقط هنوز کندل روزانه بالای {bull} نبسته، پس تأییدی در کار نیست.",
+        ])
+        tail = ""
     else:
-        body = (f"⚠️ آپدیت {t}\nاز تحلیل {fa(days)} روز پیش (قیمت اون موقع {p0}) تا الان حدود {n}٪ ریزش داشته، "
-                f"ولی هنوز کندل روزانه‌ای زیر {fa(row['bear_trigger'])} بسته نشده و سطح کلیدی تأیید نشده.")
-    return body + "\nصرفاً تحلیل می‌باشد، سیگنال خرید و فروش نیست.\n@Mr_marketcap"
+        head = rnd.choice([f"⚠️ آپدیت {t}", f"⚠️ خبر تازه از {t}"])
+        body = rnd.choice([
+            f"{ago} تا الان حدود {n}٪ {down}، ولی هنوز کندل روزانه‌ای زیر {bear} بسته نشده و سطح کلیدی تأیید نشده.",
+            f"قیمت {ago.replace('از ', 'نسبت به ', 1)} حدود {n}٪ {down}. فقط هنوز کندل روزانه زیر {bear} نبسته، پس تأییدی در کار نیست.",
+        ])
+        tail = ""
+    parts = [head, body] + ([tail] if tail else [])
+    return "\n".join(parts) + "\nصرفاً تحلیل می‌باشد، سیگنال خرید و فروش نیست.\n@Mr_marketcap"
 
 
 def run(now=None, fetch=get, send=None):
