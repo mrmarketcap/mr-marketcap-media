@@ -65,13 +65,17 @@ def run(now=None, price_fn=usd_now):
         if not DRY:
             tg("sendMessage", chat_id=CHAT, text=bold_first(text), parse_mode="HTML",
                reply_to_message_id=old["msg"], disable_notification="true")
-    question = f"تا شنبهٔ بعد، دلار بالاتر از {pdig(format(price, ','))} هست؟"
-    lines.append("new poll: " + question)
+    # Question + two options built around the live price X: "بالای X" / "پایین X" (option 0 = above,
+    # which the result message above relies on)
+    x = pdig(format(price, ','))
+    question = "تا شنبهٔ بعد دلار چنده؟"
+    options = [f"بالای {x}", f"پایین {x}"]
+    lines.append("new poll: " + question + " | " + " / ".join(options))
     print("\n".join(lines))
     if DRY:
         return lines
     res = tg("sendPoll", chat_id=CHAT, question=question,
-             options=json.dumps(["آره، بالاتر", "نه، پایین‌تر"], ensure_ascii=False),
+             options=json.dumps(options, ensure_ascii=False),
              is_anonymous="true", disable_notification="true")
     json.dump({"date": day, "poll": {"msg": res["message_id"], "price": price, "ts": now}}, open(STATE, "w"))
     return lines
