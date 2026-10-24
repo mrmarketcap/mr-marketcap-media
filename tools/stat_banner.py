@@ -41,7 +41,10 @@ async def render(pill, big, sub, tone, out):
         path = os.path.join(d, "b.html")
         open(path, "w").write(page(pill, big, sub, tone))
         async with async_playwright() as p:
-            b = await p.chromium.launch()
+            try:
+                b = await p.chromium.launch(channel="chrome")   # preinstalled on GitHub runners (no slow download)
+            except Exception:
+                b = await p.chromium.launch()
             pg = await b.new_page(viewport={"width": 1280, "height": 580}, device_scale_factor=1)
             await pg.goto("file://" + path)
             await pg.evaluate("document.fonts.ready")
