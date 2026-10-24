@@ -1,5 +1,5 @@
 """Telegram HTML helper: first line bold, rest escaped plain text.
-Alignment rule (from the user): a line that contains any Persian letter is right-aligned
+Alignment rule (from the user; hashtag and @channel lines are exempt): a line that contains any Persian letter is right-aligned
 (invisible RLM at its start); a line with no Persian letters is left-aligned (invisible LRM)."""
 import html, re
 
@@ -12,7 +12,7 @@ def rtl(text):
     out = []
     for l in text.split("\n"):
         l = l.lstrip(RLM + LRM)
-        if not l.strip():
+        if not l.strip() or l.strip().startswith(("#", "@")):   # hashtag / channel-link lines: exempt, left untouched
             out.append(l)
         else:
             out.append((RLM if _FA.search(l) else LRM) + l)
