@@ -2,5 +2,11 @@
  "fng_date": "2026-10-26",
  "movers": {},
  "summary_date": "2026-10-25",
- "weekly_week": "2026-W43"
+ "weekly_week": "2026-W43",
+ "poll": {
+  "msg": 225,
+  "price": 80100.0,
+  "ts": 1793001138
+ },
+ "poll_date": "2026-10-26"
 }
