@@ -38,13 +38,30 @@ def mark_live(cs, typ, now):
     for c in cs: c.pop("_t", None)
     return cs
 
+def weekly_from_daily(days, now):
+    """Aggregate UTC daily candles into Monday-start weekly candles (KuCoin's own 1week starts Thursday)."""
+    weeks = {}
+    for d in days:
+        day = dt.datetime.fromtimestamp(d["_t"], dt.timezone.utc)
+        mon = (day - dt.timedelta(days=day.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        k = int(mon.timestamp())
+        w = weeks.setdefault(k, {"start": mon.strftime("%Y-%m-%d"), "open": d["open"], "high": d["high"], "low": d["low"], "close": d["close"]})
+        w["high"] = max(w["high"], d["high"]); w["low"] = min(w["low"], d["low"]); w["close"] = d["close"]
+    out = []
+    for k in sorted(weeks):
+        w = weeks[k]; end = k + 7*86400
+        if now < end: w["live"] = True
+        w["closes_utc"] = dt.datetime.fromtimestamp(end, dt.timezone.utc).strftime("%Y-%m-%d %H:%M")
+        out.append(w)
+    return out
+
 def main(coins):
     now = int(time.time())
     out = {"fetched_utc": dt.datetime.fromtimestamp(now, dt.timezone.utc).isoformat(), "source": "KuCoin", "coins": {}}
     for c in coins:
         sym = f"{c}-USDT"
         lv = get(f"/api/v1/market/orderbook/level1?symbol={sym}")
-        w = mark_live(candles(sym, "1week", 86400*7*60, now), "1week", now)
+        w = weekly_from_daily(candles(sym, "1day", 86400*7*62, now), now)
         m = mark_live(candles(sym, "1month", 86400*31*40, now), "1month", now)
         out["coins"][c] = {"price": float(lv["price"]), "weekly": w, "monthly": m}
     json.dump(out, open("data/htf-candles.json", "w"), indent=1)
