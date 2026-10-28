@@ -33,3 +33,4 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-28,BTC,262,80980.2,82000,79500,daily,,open
 2026-10-28,ETH,263,2355.76,2400,2280,daily,,open
 2026-10-28,ADA,264,0.2067,0.2125,0.2005,daily,,open
+2026-10-28,BCH,269,297.94,305,277,midday,,open
