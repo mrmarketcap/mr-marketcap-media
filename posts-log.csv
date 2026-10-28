@@ -1,5 +1,5 @@
 date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reported,status
-2026-10-20,WLD,101,0.537,0.586,0.460,daily,bear,open
+2026-10-20,WLD,101,0.537,0.586,0.460,daily,bear|down20,open
 2026-10-21,BTC,105,82734,84300,81000,daily,bear,open
 2026-10-21,ETH,106,2448,2540,2320,daily,,open
 2026-10-21,SOL,107,106.2,109,103,daily,bear,open
@@ -24,7 +24,7 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-25,BNB,214,737.8,751,718,midday,,open
 2026-10-26,BTC,220,80057.1,81000,79200,daily,,open
 2026-10-26,ETH,221,2318.8,2370,2280,daily,,open
-2026-10-26,DOGE,222,0.07694,0.0781,0.0748,daily,,open
+2026-10-26,DOGE,222,0.07694,0.0781,0.0748,daily,bull,open
 2026-10-26,AAVE,229,135.143,139,133.5,midday,,open
 2026-10-27,BTC,249,79759.8,81000,79200,daily,,open
 2026-10-27,ETH,250,2309.9,2370,2280,daily,,open
