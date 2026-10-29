@@ -26,10 +26,10 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-26,ETH,221,2318.8,2370,2280,daily,,open
 2026-10-26,DOGE,222,0.07694,0.0781,0.0748,daily,bull,open
 2026-10-26,AAVE,229,135.143,139,133.5,midday,,open
-2026-10-27,BTC,249,79759.8,81000,79200,daily,,open
+2026-10-27,BTC,249,79759.8,81000,79200,daily,bull,open
 2026-10-27,ETH,250,2309.9,2370,2280,daily,,open
 2026-10-27,SOL,251,99.93,103,98.6,daily,,open
-2026-10-27,NEAR,254,4.4889,4.71,4.40,midday,,open
+2026-10-27,NEAR,254,4.4889,4.71,4.40,midday,bull,open
 2026-10-28,BTC,262,80980.2,82000,79500,daily,,open
 2026-10-28,ETH,263,2355.76,2400,2280,daily,,open
 2026-10-28,ADA,264,0.2067,0.2125,0.2005,daily,,open
