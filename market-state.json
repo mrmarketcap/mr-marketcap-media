@@ -1,6 +1,8 @@
 {
  "fng_date": "2026-10-29",
- "movers": {},
+ "movers": {
+  "TRX": 1793310601
+ },
  "summary_date": "2026-10-29",
  "weekly_week": "2026-W43",
  "poll": {
