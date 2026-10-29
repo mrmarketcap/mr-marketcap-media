@@ -1,13 +1,13 @@
 {
  "last_run_utc": "2026-10-27T06:38:00Z",
  "day": "2026-10-29",
- "alerts_today": 16,
+ "alerts_today": 17,
  "BTC": {
   "last_price": 79775,
-  "last_alert_level": 78500,
+  "last_alert_level": 78000,
   "last_alert_utc": "2026-10-21T15:50:00Z",
-  "alerts_today": 16,
-  "last_alert_ts": 1793317337
+  "alerts_today": 17,
+  "last_alert_ts": 1793317697
  },
  "ETH": {
   "last_price": 2310.45,
