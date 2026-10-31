@@ -39,3 +39,6 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-30,ETH,316,2251.03,2350,2175,daily,,open
 2026-10-30,SUI,317,0.8951,0.94,0.86,daily,,open
 2026-10-30,HBAR,324,0.07189,0.0745,0.0703,midday,,open
+2026-10-31,BTC,340,77115.5,78800,76300,daily,,open
+2026-10-31,ETH,341,2237.5,2280,2175,daily,,open
+2026-10-31,BNB,342,701.4,722,680,daily,,open
