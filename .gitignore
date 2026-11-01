@@ -2,3 +2,5 @@ pending.json
 __pycache__/
 test-banner.jpg
 out.txt
+
+scalper/.env
