@@ -21,6 +21,9 @@ def fetch(ex, symbol, tf, days):
         chunk = ex.fetch_ohlcv(symbol, tf, since=since, limit=100)
         new = [c for c in chunk if c[0] not in seen]
         if not new:
+            if not out and since < now:   # requested start is before the pair existed
+                since += 100 * ms * 10     # skip ahead until data begins
+                continue
             break
         for c in new:
             seen.add(c[0])

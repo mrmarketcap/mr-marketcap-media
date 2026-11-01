@@ -187,6 +187,8 @@ def load(ex, tf):
 
 def evaluate(candles, tf):
     d = Data(candles)
+    if d.n < 600:
+        raise SystemExit(f"[{tf}] only {d.n} candles downloaded - not enough history")
     cut = int(d.n * 0.6)
     bh = (d.c[-1] / d.c[cut] - 1) * 100
     rows = []
