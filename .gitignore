@@ -4,3 +4,5 @@ test-banner.jpg
 out.txt
 
 scalper/.env
+
+scalper/cache_*.json
