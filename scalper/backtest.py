@@ -11,17 +11,24 @@ from risk import RiskManager
 
 
 def fetch(ex, symbol, tf, days):
+    """Page through history. Exchanges cap each reply (OKX: 100-300), so keep
+    asking from the last received candle until we reach 'now'."""
     ms = ex.parse_timeframe(tf) * 1000
-    since = ex.milliseconds() - days * 86400_000
-    out = []
-    while since < ex.milliseconds():
-        chunk = ex.fetch_ohlcv(symbol, tf, since=since, limit=1000)
-        if not chunk:
+    now = ex.milliseconds()
+    since = now - days * 86400_000
+    out, seen = [], set()
+    while since < now:
+        chunk = ex.fetch_ohlcv(symbol, tf, since=since, limit=100)
+        new = [c for c in chunk if c[0] not in seen]
+        if not new:
             break
-        out += chunk
-        since = chunk[-1][0] + ms
-        if len(chunk) < 1000:
-            break
+        for c in new:
+            seen.add(c[0])
+        out += new
+        since = new[-1][0] + ms
+        if len(out) % 2000 < len(new):
+            print(f"  downloaded {len(out)} candles...", flush=True)
+    out.sort(key=lambda c: c[0])
     return out
 
 
