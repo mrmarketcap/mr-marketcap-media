@@ -1,6 +1,6 @@
 """Backtest the strategy on historical candles, including fees and slippage.
 
-  python backtest.py --symbol BTC/USDT --days 7
+  python backtest.py --symbol BNB/USDT:USDT --days 7
 Conservative assumptions: stop is checked before target within the same candle.
 """
 import argparse
@@ -25,8 +25,8 @@ def fetch(ex, symbol, tf, days):
     return out
 
 
-def run(candles, budget=100.0, fee=0.001, slip=0.0002, risk=0.005, p=Params()):
-    rm = RiskManager(budget=budget, risk_per_trade=risk, cooldown_sec=0,
+def run(candles, budget=100.0, fee=0.0005, slip=0.0002, risk=0.005, lev=3, p=Params()):
+    rm = RiskManager(budget=budget, leverage=lev, risk_per_trade=risk, cooldown_sec=0,
                      max_trades_per_day=10**9, max_daily_loss=10.0)
     equity, trades, peak, mdd, i = budget, [], budget, 0.0, 0
     warm = 130
@@ -38,20 +38,24 @@ def run(candles, budget=100.0, fee=0.001, slip=0.0002, risk=0.005, p=Params()):
         if not sig:
             i += 1
             continue
-        entry = candles[i + 1][1] * (1 + slip)       # fill at next open
-        stop, target = sig.stop - (sig.entry - entry), sig.target - (sig.entry - entry)
+        d = 1 if sig.side == "long" else -1
+        entry = candles[i + 1][1] * (1 + d * slip)   # fill at next open, worse price
+        shift = entry - sig.entry
+        stop, target = sig.stop + shift, sig.target + shift
         qty = rm.size(entry, stop)
         exit_px, j = None, i + 1
         while j < len(candles):
             lo, hi = candles[j][3], candles[j][2]
-            if lo <= stop:
-                exit_px = stop * (1 - slip); break
-            if hi >= target:
-                exit_px = target * (1 - slip); break
+            hit_sl = lo <= stop if d == 1 else hi >= stop
+            hit_tp = hi >= target if d == 1 else lo <= target
+            if hit_sl:   # stop checked first (conservative)
+                exit_px = stop * (1 - d * slip); break
+            if hit_tp:
+                exit_px = target * (1 - d * slip); break
             j += 1
         if exit_px is None:
             break
-        pnl = qty * (exit_px - entry) - fee * qty * (entry + exit_px)
+        pnl = d * qty * (exit_px - entry) - fee * qty * (entry + exit_px)
         equity += pnl
         peak = max(peak, equity); mdd = max(mdd, (peak - equity) / peak)
         trades.append(pnl)
@@ -66,14 +70,15 @@ def run(candles, budget=100.0, fee=0.001, slip=0.0002, risk=0.005, p=Params()):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--exchange", default=os.getenv("EXCHANGE", "binance"))
-    ap.add_argument("--symbol", default=os.getenv("SYMBOL", "BTC/USDT"))
+    ap.add_argument("--exchange", default=os.getenv("EXCHANGE", "okx"))
+    ap.add_argument("--symbol", default=os.getenv("SYMBOL", "BNB/USDT:USDT"))
     ap.add_argument("--timeframe", default="1m")
     ap.add_argument("--days", type=int, default=7)
-    ap.add_argument("--fee", type=float, default=0.001)
+    ap.add_argument("--leverage", type=float, default=3)
+    ap.add_argument("--fee", type=float, default=0.0005)
     a = ap.parse_args()
     ex = getattr(ccxt, a.exchange)({"enableRateLimit": True})
     c = fetch(ex, a.symbol, a.timeframe, a.days)
     print(f"{len(c)} candles")
-    for k, v in run(c, fee=a.fee).items():
+    for k, v in run(c, fee=a.fee, lev=a.leverage).items():
         print(f"{k:>18}: {v:.4f}" if isinstance(v, float) else f"{k:>18}: {v}")

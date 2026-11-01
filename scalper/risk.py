@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 @dataclass
 class RiskManager:
     budget: float
+    leverage: float = 3.0
     risk_per_trade: float = 0.005
     max_daily_loss: float = 0.02
     max_trades_per_day: int = 40
@@ -34,12 +35,13 @@ class RiskManager:
 
     def size(self, entry: float, stop: float) -> float:
         """Base-asset quantity so that hitting the stop loses risk_per_trade*budget,
-        capped so notional never exceeds the budget."""
-        risk_per_unit = entry - stop
+        capped so notional never exceeds budget*leverage."""
+        risk_per_unit = abs(entry - stop)
         if risk_per_unit <= 0:
             return 0.0
         qty = (self.budget * self.risk_per_trade) / risk_per_unit
-        return min(qty, self.budget / entry)
+        # futures: notional capped at budget*leverage (5% margin buffer for fees)
+        return min(qty, self.budget * self.leverage * 0.95 / entry)
 
     def record(self, pnl: float):
         self._roll_day()

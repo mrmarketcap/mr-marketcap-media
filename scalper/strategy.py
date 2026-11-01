@@ -1,4 +1,4 @@
-"""Scalping strategy: EMA crossover + RSI filter + ATR-based stop/target.
+"""Scalping strategy (long + short): EMA crossover + RSI filter + ATR-based stop/target.
 
 Pure functions, no I/O, so the same code runs in backtest, paper and live.
 Candle = [timestamp_ms, open, high, low, close, volume]  (ccxt format)
@@ -70,13 +70,14 @@ class Params:
 
 @dataclass
 class Signal:
+    side: str  # "long" | "short"
     entry: float
     stop: float
     target: float
 
 
 def entry_signal(candles: List[list], p: Params = Params()) -> Optional[Signal]:
-    """Long-only signal evaluated on the last CLOSED candle (candles[-1])."""
+    """Long/short signal evaluated on the last CLOSED candle (candles[-1])."""
     n = len(candles)
     if n < max(p.trend, p.slow, p.rsi_period, p.atr_period) + 3:
         return None
@@ -85,10 +86,11 @@ def entry_signal(candles: List[list], p: Params = Params()) -> Optional[Signal]:
     r, a = rsi(closes, p.rsi_period)[-1], atr(candles, p.atr_period)[-1]
     if r is None or a is None:
         return None
-    crossed_up = f[-2] <= s[-2] and f[-1] > s[-1]
     price = closes[-1]
-    if not (crossed_up and price > t[-1] and p.rsi_min <= r <= p.rsi_max):
-        return None
     if a / price < p.min_atr_pct:
         return None
-    return Signal(entry=price, stop=price - p.sl_atr * a, target=price + p.tp_atr * a)
+    if f[-2] <= s[-2] and f[-1] > s[-1] and price > t[-1] and p.rsi_min <= r <= p.rsi_max:
+        return Signal("long", price, price - p.sl_atr * a, price + p.tp_atr * a)
+    if f[-2] >= s[-2] and f[-1] < s[-1] and price < t[-1] and 100 - p.rsi_max <= r <= 100 - p.rsi_min:
+        return Signal("short", price, price + p.sl_atr * a, price - p.tp_atr * a)
+    return None
