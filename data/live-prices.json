@@ -1,12 +1,12 @@
 {
- "fetched_utc": "2026-11-03T05:45:18+00:00",
- "fetched_tehran": "2026-11-03 09:15",
+ "fetched_utc": "2026-11-03T06:34:44+00:00",
+ "fetched_tehran": "2026-11-03 10:04",
  "source": "KuCoin",
  "coins": {
   "BTC": {
-   "price": 76738.8,
-   "price_time_tehran": "2026-11-03 09:15",
-   "price_age_s": 0,
+   "price": 76788.4,
+   "price_time_tehran": "2026-11-03 10:04",
+   "price_age_s": 1,
    "candles": [
     {
      "date": "2026-09-29",
@@ -257,16 +257,16 @@
      "date": "2026-11-03",
      "open": 76809.0,
      "high": 77297.7,
-     "low": 76552.1,
-     "close": 76738.8,
+     "low": 76396.0,
+     "close": 76788.4,
      "live": true
     }
    ]
   },
   "ETH": {
-   "price": 2251.75,
-   "price_time_tehran": "2026-11-03 09:15",
-   "price_age_s": 1,
+   "price": 2254.25,
+   "price_time_tehran": "2026-11-03 10:04",
+   "price_age_s": 12,
    "candles": [
     {
      "date": "2026-09-29",
@@ -517,16 +517,16 @@
      "date": "2026-11-03",
      "open": 2253.08,
      "high": 2264.57,
-     "low": 2244.82,
-     "close": 2251.75,
+     "low": 2241.01,
+     "close": 2254.25,
      "live": true
     }
    ]
   },
   "ADA": {
-   "price": 0.1881,
-   "price_time_tehran": "2026-11-03 09:14",
-   "price_age_s": 35,
+   "price": 0.1877,
+   "price_time_tehran": "2026-11-03 10:03",
+   "price_age_s": 90,
    "candles": [
     {
      "date": "2026-09-29",
@@ -777,8 +777,8 @@
      "date": "2026-11-03",
      "open": 0.1887,
      "high": 0.1901,
-     "low": 0.1872,
-     "close": 0.1881,
+     "low": 0.187,
+     "close": 0.1877,
      "live": true
     }
    ]
