@@ -51,3 +51,6 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-02,ETH,374,2296,2320,2240,daily,,open
 2026-11-02,SOL,375,95.05,97,92,daily,,open
 2026-11-02,NEAR,385,4.105,4.445,4.043,midday,,open
+2026-11-03,BTC,394,76788,78900,76300,daily,,open
+2026-11-03,ETH,395,2254,2320,2175,daily,,open
+2026-11-03,ADA,396,0.1877,0.195,0.1823,daily,,open
