@@ -55,3 +55,4 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-03,ETH,395,2254,2320,2175,daily,,open
 2026-11-03,ADA,396,0.1877,0.195,0.1823,daily,,open
 2026-11-03,DOGE,403,0.07469,0.0768,0.0732,midday,,open
+2026-11-05,BCH,443,288.3,290,272,midday,,open
