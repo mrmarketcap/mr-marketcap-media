@@ -56,3 +56,6 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-03,ADA,396,0.1877,0.195,0.1823,daily,,open
 2026-11-03,DOGE,403,0.07469,0.0768,0.0732,midday,,open
 2026-11-05,BCH,443,288.3,290,272,midday,,open
+2026-11-06,BTC,470,75754,78000,75000,daily,,open
+2026-11-06,ETH,471,2233,2320,2200,daily,,open
+2026-11-06,LINK,472,10.76,11.00,10.50,daily,,open
