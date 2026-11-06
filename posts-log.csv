@@ -5,10 +5,10 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-21,SOL,107,106.2,109,103,daily,bear,closed
 2026-10-21,COMP,110,25.85,26.88,25.60,midday,bear|down20,closed
 2026-10-21,BICO,111,0.01658,0.01770,0.01547,manual,bear,closed
-2026-10-22,BTC,151,84100,84300,82500,daily,bear,open
-2026-10-22,ETH,152,2474,2580,2320,daily,bear,open
-2026-10-22,ZEC,153,1283,1380,1250,daily,bear,open
-2026-10-22,XMR,160,646,650,600,midday,bear,open
+2026-10-22,BTC,151,84100,84300,82500,daily,bear,closed
+2026-10-22,ETH,152,2474,2580,2320,daily,bear,closed
+2026-10-22,ZEC,153,1283,1380,1250,daily,bear,closed
+2026-10-22,XMR,160,646,650,600,midday,bear,closed
 2026-10-23,BTC,171,81809,84900,79900,daily,bear,open
 2026-10-23,ETH,172,2401.99,2525,2320,daily,bear,open
 2026-10-23,AVAX,173,9.299,10.05,9.05,daily,bear,open
@@ -46,10 +46,10 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-01,BTC,354,77800,78800,76300,daily,bull,open
 2026-11-01,ETH,355,2267,2300,2175,daily,bull,open
 2026-11-01,LTC,356,56.04,56.5,54.3,daily,bear,open
-2026-11-01,XRP,363,1.255,1.274,1.240,midday,,open
+2026-11-01,XRP,363,1.255,1.274,1.240,midday,bear|bull,closed
 2026-11-02,BTC,373,78449,78900,77000,daily,bull,open
 2026-11-02,ETH,374,2296,2320,2240,daily,bull,open
-2026-11-02,SOL,375,95.05,97,92,daily,,open
+2026-11-02,SOL,375,95.05,97,92,daily,bear,open
 2026-11-02,NEAR,385,4.105,4.445,4.043,midday,bear,open
 2026-11-03,BTC,394,76788,78900,76300,daily,bull,open
 2026-11-03,ETH,395,2254,2320,2175,daily,bull,open
