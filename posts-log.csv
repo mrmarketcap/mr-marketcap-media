@@ -63,3 +63,4 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-07,BTC,490,76043,78000,75000,daily,,open
 2026-11-07,ETH,491,2246.22,2300,2200,daily,,open
 2026-11-07,AVAX,492,8.33,8.75,8,daily,,open
+2026-11-07,SUI,498,0.8607,0.887,0.846,midday,,open
