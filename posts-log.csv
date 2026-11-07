@@ -60,3 +60,6 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-06,ETH,471,2233,2320,2200,daily,,open
 2026-11-06,LINK,472,10.76,11.00,10.50,daily,,open
 2026-11-06,XLM,478,0.1546,0.1579,0.1515,midday,,open
+2026-11-07,BTC,490,76043,78000,75000,daily,,open
+2026-11-07,ETH,491,2246.22,2300,2200,daily,,open
+2026-11-07,AVAX,492,8.33,8.75,8,daily,,open
