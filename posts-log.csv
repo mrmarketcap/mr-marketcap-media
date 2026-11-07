@@ -9,9 +9,9 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-22,ETH,152,2474,2580,2320,daily,bear,closed
 2026-10-22,ZEC,153,1283,1380,1250,daily,bear,closed
 2026-10-22,XMR,160,646,650,600,midday,bear,closed
-2026-10-23,BTC,171,81809,84900,79900,daily,bear,open
-2026-10-23,ETH,172,2401.99,2525,2320,daily,bear,open
-2026-10-23,AVAX,173,9.299,10.05,9.05,daily,bear,open
+2026-10-23,BTC,171,81809,84900,79900,daily,bear,closed
+2026-10-23,ETH,172,2401.99,2525,2320,daily,bear,closed
+2026-10-23,AVAX,173,9.299,10.05,9.05,daily,bear,closed
 2026-10-23,TRX,177,0.3304,0.3374,0.3261,midday,bear|bull,closed
 2026-10-24,BTC,185,80908,83000,79800,daily,bear,open
 2026-10-24,ETH,186,2383.06,2480,2317,daily,bear,open
@@ -34,7 +34,7 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-10-28,ETH,263,2355.76,2400,2280,daily,bull|bear,closed
 2026-10-28,ADA,264,0.2067,0.2125,0.2005,daily,bear,open
 2026-10-28,BCH,269,297.94,305,277,midday,bear,open
-2026-10-29,AVAX,286,8.78,9.18,8.67,midday,,open
+2026-10-29,AVAX,286,8.78,9.18,8.67,midday,bear,open
 2026-10-30,BTC,315,78541.8,80000,76500,daily,bull,open
 2026-10-30,ETH,316,2251.03,2350,2175,daily,bull,open
 2026-10-30,SUI,317,0.8951,0.94,0.86,daily,,open
@@ -55,7 +55,7 @@ date,ticker,message_id,price_at_post,bull_trigger,bear_trigger,post_type,reporte
 2026-11-03,ETH,395,2254,2320,2175,daily,bull,open
 2026-11-03,ADA,396,0.1877,0.195,0.1823,daily,,open
 2026-11-03,DOGE,403,0.07469,0.0768,0.0732,midday,,open
-2026-11-05,BCH,443,288.3,290,272,midday,,open
+2026-11-05,BCH,443,288.3,290,272,midday,bear,open
 2026-11-06,BTC,470,75754,78000,75000,daily,,open
 2026-11-06,ETH,471,2233,2320,2200,daily,,open
 2026-11-06,LINK,472,10.76,11.00,10.50,daily,,open
